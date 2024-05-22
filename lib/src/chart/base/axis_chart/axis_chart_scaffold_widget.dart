@@ -19,14 +19,14 @@ import 'package:flutter/material.dart';
 /// `left`, `top`, `right`, `bottom` are some place holders to show titles
 /// provided by [AxisChartData.titlesData] around the chart
 /// `chart` is a centered place holder to show a raw chart.
-class AxisChartScaffoldWidget extends StatelessWidget {
+class AxisChartScaffoldWidget<T> extends StatelessWidget {
   const AxisChartScaffoldWidget({
     super.key,
     required this.chart,
     required this.data,
   });
   final Widget chart;
-  final AxisChartData data;
+  final AxisChartData<T> data;
 
   bool get showLeftTitles {
     if (!data.titlesData.show) {

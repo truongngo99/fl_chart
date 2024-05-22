@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 ///
 /// In this phase we draw the border,
 /// and handle touches in an abstract way.
-abstract class BaseChartData with EquatableMixin {
+abstract class BaseChartData<T> with EquatableMixin {
   /// It draws 4 borders around your chart, you can customize it using [borderData],
   /// [touchData] defines the touch behavior and responses.
   BaseChartData({
@@ -25,7 +25,7 @@ abstract class BaseChartData with EquatableMixin {
   /// Holds data needed to touch behavior and responses.
   FlTouchData touchData;
 
-  BaseChartData lerp(BaseChartData a, BaseChartData b, double t);
+  BaseChartData<T> lerp(BaseChartData<T> a, BaseChartData<T> b, double t);
 
   /// Used for equality check, see [EquatableMixin].
   @override
@@ -130,20 +130,16 @@ class FlClipData with EquatableMixin {
   });
 
   /// Creates data that clips all sides
-  const FlClipData.all()
-      : this(top: true, bottom: true, left: true, right: true);
+  const FlClipData.all() : this(top: true, bottom: true, left: true, right: true);
 
   /// Creates data that clips only top and bottom side
-  const FlClipData.vertical()
-      : this(top: true, bottom: true, left: false, right: false);
+  const FlClipData.vertical() : this(top: true, bottom: true, left: false, right: false);
 
   /// Creates data that clips only left and right side
-  const FlClipData.horizontal()
-      : this(top: false, bottom: false, left: true, right: true);
+  const FlClipData.horizontal() : this(top: false, bottom: false, left: true, right: true);
 
   /// Creates data that doesn't clip any side
-  const FlClipData.none()
-      : this(top: false, bottom: false, left: false, right: false);
+  const FlClipData.none() : this(top: false, bottom: false, left: false, right: false);
 
   final bool top;
   final bool bottom;

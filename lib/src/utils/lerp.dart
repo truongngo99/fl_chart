@@ -24,8 +24,7 @@ List<T>? lerpList<T>(
 }
 
 /// Lerps [Color] list based on [t] value, check [Tween.lerp].
-List<Color>? lerpColorList(List<Color>? a, List<Color>? b, double t) =>
-    lerpList(a, b, t, lerp: lerpColor);
+List<Color>? lerpColorList(List<Color>? a, List<Color>? b, double t) => lerpList(a, b, t, lerp: lerpColor);
 
 /// Lerps [Color] based on [t] value, check [Color.lerp].
 Color lerpColor(Color a, Color b, double t) => Color.lerp(a, b, t)!;
@@ -46,12 +45,10 @@ double? lerpDoubleAllowInfinity(double? a, double? b, double t) {
 }
 
 /// Lerps [double] list based on [t] value, check [Tween.lerp].
-List<double>? lerpDoubleList(List<double>? a, List<double>? b, double t) =>
-    lerpList(a, b, t, lerp: lerpNonNullDouble);
+List<double>? lerpDoubleList(List<double>? a, List<double>? b, double t) => lerpList(a, b, t, lerp: lerpNonNullDouble);
 
 /// Lerps [int] list based on [t] value, check [Tween.lerp].
-List<int>? lerpIntList(List<int>? a, List<int>? b, double t) =>
-    lerpList(a, b, t, lerp: lerpInt);
+List<int>? lerpIntList(List<int>? a, List<int>? b, double t) => lerpList(a, b, t, lerp: lerpInt);
 
 /// Lerps [int] list based on [t] value, check [Tween.lerp].
 int lerpInt(int a, int b, double t) => (a + (b - a) * t).round();
@@ -60,8 +57,7 @@ int lerpInt(int a, int b, double t) => (a + (b - a) * t).round();
 double lerpNonNullDouble(double a, double b, double t) => lerpDouble(a, b, t)!;
 
 /// Lerps [FlSpot] list based on [t] value, check [Tween.lerp].
-List<FlSpot>? lerpFlSpotList(List<FlSpot>? a, List<FlSpot>? b, double t) =>
-    lerpList(a, b, t, lerp: FlSpot.lerp);
+List<FlSpot<T>>? lerpFlSpotList<T>(List<FlSpot<T>>? a, List<FlSpot<T>>? b, double t) => lerpList(a, b, t, lerp: FlSpot.lerp);
 
 /// Lerps [HorizontalLine] list based on [t] value, check [Tween.lerp].
 List<HorizontalLine>? lerpHorizontalLineList(
@@ -96,9 +92,9 @@ List<VerticalRangeAnnotation>? lerpVerticalRangeAnnotationList(
     lerpList(a, b, t, lerp: VerticalRangeAnnotation.lerp);
 
 /// Lerps [LineChartBarData] list based on [t] value, check [Tween.lerp].
-List<LineChartBarData>? lerpLineChartBarDataList(
-  List<LineChartBarData>? a,
-  List<LineChartBarData>? b,
+List<LineChartBarData<T>>? lerpLineChartBarDataList<T>(
+  List<LineChartBarData<T>>? a,
+  List<LineChartBarData<T>>? b,
   double t,
 ) =>
     lerpList(a, b, t, lerp: LineChartBarData.lerp);
@@ -136,12 +132,12 @@ List<PieChartSectionData>? lerpPieChartSectionDataList(
     lerpList(a, b, t, lerp: PieChartSectionData.lerp);
 
 /// Lerps [ScatterSpot] list based on [t] value, check [Tween.lerp].
-List<ScatterSpot>? lerpScatterSpotList(
-  List<ScatterSpot>? a,
-  List<ScatterSpot>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: ScatterSpot.lerp);
+// List<ScatterSpot>? lerpScatterSpotList(
+//   List<ScatterSpot>? a,
+//   List<ScatterSpot>? b,
+//   double t,
+// ) =>
+//     lerpList(a, b, t, lerp: ScatterSpot.lerp);
 
 /// Lerps [BarChartRodStackItem] list based on [t] value, check [Tween.lerp].
 List<BarChartRodStackItem>? lerpBarChartRodStackList(

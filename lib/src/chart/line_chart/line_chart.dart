@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// Renders a line chart as a widget, using provided [LineChartData].
-class LineChart extends ImplicitlyAnimatedWidget {
+class LineChart<T> extends ImplicitlyAnimatedWidget {
   /// [data] determines how the [LineChart] should be look like,
   /// when you make any change in the [LineChartData], it updates
   /// new values with animation, and duration is [swapAnimationDuration].
@@ -21,7 +21,7 @@ class LineChart extends ImplicitlyAnimatedWidget {
   });
 
   /// Determines how the [LineChart] should be look like.
-  final LineChartData data;
+  final LineChartData<T> data;
 
   /// We pass this key to our renderers which are supposed to
   /// render the chart itself (without anything around the chart).
@@ -29,19 +29,19 @@ class LineChart extends ImplicitlyAnimatedWidget {
 
   /// Creates a [_LineChartState]
   @override
-  _LineChartState createState() => _LineChartState();
+  _LineChartState<T> createState() => _LineChartState();
 }
 
-class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
+class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
   /// we handle under the hood animations (implicit animations) via this tween,
   /// it lerps between the old [LineChartData] to the new one.
-  LineChartDataTween? _lineChartDataTween;
+  LineChartDataTween<T>? _lineChartDataTween;
 
   /// If [LineTouchData.handleBuiltInTouches] is true, we override the callback to handle touches internally,
   /// but we need to keep the provided callback to notify it too.
-  BaseTouchCallback<LineTouchResponse>? _providedTouchCallback;
+  BaseTouchCallback<LineTouchResponse<T>>? _providedTouchCallback;
 
-  final List<ShowingTooltipIndicators> _showingTouchedTooltips = [];
+  final List<ShowingTooltipIndicators<T>> _showingTouchedTooltips = [];
 
   final Map<int, List<int>> _showingTouchedIndicators = {};
 
@@ -51,8 +51,8 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
   Widget build(BuildContext context) {
     final showingData = _getData();
 
-    return AxisChartScaffoldWidget(
-      chart: LineChartLeaf(
+    return AxisChartScaffoldWidget<T>(
+      chart: LineChartLeaf<T>(
         data: _withTouchedIndicators(_lineChartDataTween!.evaluate(animation)),
         targetData: _withTouchedIndicators(showingData),
         key: widget.chartRendererKey,
@@ -61,9 +61,8 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     );
   }
 
-  LineChartData _withTouchedIndicators(LineChartData lineChartData) {
-    if (!lineChartData.lineTouchData.enabled ||
-        !lineChartData.lineTouchData.handleBuiltInTouches) {
+  LineChartData<T> _withTouchedIndicators(LineChartData<T> lineChartData) {
+    if (!lineChartData.lineTouchData.enabled || !lineChartData.lineTouchData.handleBuiltInTouches) {
       return lineChartData;
     }
 
@@ -78,15 +77,12 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     );
   }
 
-  LineChartData _getData() {
+  LineChartData<T> _getData() {
     var newData = widget.data;
 
     /// Calculate minX, maxX, minY, maxY for [LineChartData] if they are null,
     /// it is necessary to render the chart correctly.
-    if (newData.minX.isNaN ||
-        newData.maxX.isNaN ||
-        newData.minY.isNaN ||
-        newData.maxY.isNaN) {
+    if (newData.minX.isNaN || newData.maxX.isNaN || newData.minY.isNaN || newData.maxY.isNaN) {
       final values = _lineChartHelper.calculateMaxAxisValues(
         newData.lineBarsData,
       );
@@ -102,26 +98,22 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     if (lineTouchData.enabled && lineTouchData.handleBuiltInTouches) {
       _providedTouchCallback = lineTouchData.touchCallback;
       newData = newData.copyWith(
-        lineTouchData:
-            newData.lineTouchData.copyWith(touchCallback: _handleBuiltInTouch),
+        lineTouchData: newData.lineTouchData.copyWith(touchCallback: _handleBuiltInTouch),
       );
     }
-
     return newData;
   }
 
   void _handleBuiltInTouch(
     FlTouchEvent event,
-    LineTouchResponse? touchResponse,
+    LineTouchResponse<T>? touchResponse,
   ) {
     if (!mounted) {
       return;
     }
     _providedTouchCallback?.call(event, touchResponse);
 
-    if (!event.isInterestedForInteractions ||
-        touchResponse?.lineBarSpots == null ||
-        touchResponse!.lineBarSpots!.isEmpty) {
+    if (!event.isInterestedForInteractions || touchResponse?.lineBarSpots == null || touchResponse!.lineBarSpots!.isEmpty) {
       setState(() {
         _showingTouchedTooltips.clear();
         _showingTouchedIndicators.clear();
@@ -130,8 +122,7 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     }
 
     setState(() {
-      final sortedLineSpots = List.of(touchResponse.lineBarSpots!)
-        ..sort((spot1, spot2) => spot2.y.compareTo(spot1.y));
+      final sortedLineSpots = List.of(touchResponse.lineBarSpots!)..sort((spot1, spot2) => spot2.y.compareTo(spot1.y));
 
       _showingTouchedIndicators.clear();
       for (var i = 0; i < touchResponse.lineBarSpots!.length; i++) {
@@ -151,8 +142,13 @@ class _LineChartState extends AnimatedWidgetBaseState<LineChart> {
     _lineChartDataTween = visitor(
       _lineChartDataTween,
       _getData(),
-      (dynamic value) =>
-          LineChartDataTween(begin: value as LineChartData, end: widget.data),
-    ) as LineChartDataTween?;
+      (dynamic value) => LineChartDataTween<T>(begin: value as LineChartData<T>, end: widget.data),
+    ) as LineChartDataTween<T>?;
   }
+}
+
+class CustomFlDot<T> extends FlDotData {
+  final T data;
+
+  CustomFlDot(this.data);
 }

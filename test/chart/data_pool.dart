@@ -279,33 +279,7 @@ class MockData {
     radius: 4,
   );
 
-  static final scatterSpot0 = ScatterSpot(
-    0,
-    0,
-    dotPainter: FlDotCirclePainter(color: color0),
-  );
-  static final scatterSpot1 = ScatterSpot(
-    1,
-    1,
-    dotPainter: FlDotCirclePainter(color: color1),
-  );
-  static final scatterSpot2 = ScatterSpot(
-    2,
-    2,
-    dotPainter: FlDotCirclePainter(color: color2),
-  );
-  static final scatterSpot3 = ScatterSpot(
-    3,
-    3,
-    dotPainter: FlDotCirclePainter(color: color3),
-  );
-  static final scatterSpot4 = ScatterSpot(
-    4,
-    4,
-    dotPainter: FlDotCirclePainter(color: color4),
-  );
 
-  static final scatterTouchedSpot = ScatterTouchedSpot(scatterSpot1, 0);
 
   static final pieChartSectionData1 = PieChartSectionData(value: 12);
   static final pieTouchedSection1 = PieTouchedSection(
@@ -641,37 +615,12 @@ final FlBorderData borderData2 = FlBorderData(
 
 bool checkToShowSpotLine(FlSpot spot) => true;
 
-const BarAreaSpotsLine barAreaSpotsLine1 =
-    BarAreaSpotsLine(show: true, checkToShowSpotLine: checkToShowSpotLine);
-const BarAreaSpotsLine barAreaSpotsLine1Clone =
-    BarAreaSpotsLine(show: true, checkToShowSpotLine: checkToShowSpotLine);
 
 const BarAreaSpotsLine barAreaSpotsLine2 = BarAreaSpotsLine(
   show: true,
 );
 
-final BarAreaData barAreaData1 = BarAreaData(
-  show: true,
-  cutOffY: 12,
-  gradient: const LinearGradient(
-    colors: [Colors.green, Colors.blue],
-    stops: [0, 0.5],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomCenter,
-  ),
-  spotsLine: barAreaSpotsLine1,
-);
-final BarAreaData barAreaData1Clone = BarAreaData(
-  show: true,
-  cutOffY: 12,
-  gradient: const LinearGradient(
-    colors: [Colors.green, Colors.blue],
-    stops: [0, 0.5],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomCenter,
-  ),
-  spotsLine: barAreaSpotsLine1,
-);
+
 
 final BarAreaData barAreaData2 = BarAreaData(
   show: true,
@@ -757,26 +706,7 @@ FlDotCirclePainter getDotDrawerTouched6(
 ) =>
     FlDotCirclePainter(radius: 12.01, color: Colors.red);
 
-const FlDotData flDotData1 = FlDotData(
-  getDotPainter: getDotDrawer,
-  checkToShowDot: checkToShowDot,
-);
-const FlDotData flDotData1Clone = FlDotData(
-  getDotPainter: getDotDrawer,
-  checkToShowDot: checkToShowDot,
-);
 
-const FlDotData flDotData4 = FlDotData(
-  getDotPainter: getDotDrawer,
-);
-
-const FlDotData flDotData5 = FlDotData(
-  getDotPainter: getDotDrawer5,
-);
-
-const FlDotData flDotData6 = FlDotData(
-  getDotPainter: getDotDrawer6,
-);
 
 const Shadow shadow1 = Shadow(
   color: Colors.red,

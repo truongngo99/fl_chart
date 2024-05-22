@@ -9,18 +9,18 @@ import 'package:flutter/material.dart';
 // coverage:ignore-start
 
 /// Low level LineChart Widget.
-class LineChartLeaf extends LeafRenderObjectWidget {
+class LineChartLeaf<T> extends LeafRenderObjectWidget {
   const LineChartLeaf({
     super.key,
     required this.data,
     required this.targetData,
   });
 
-  final LineChartData data;
-  final LineChartData targetData;
+  final LineChartData<T> data;
+  final LineChartData<T> targetData;
 
   @override
-  RenderLineChart createRenderObject(BuildContext context) => RenderLineChart(
+  RenderLineChart<T> createRenderObject(BuildContext context) => RenderLineChart(
         context,
         data,
         targetData,
@@ -28,7 +28,7 @@ class LineChartLeaf extends LeafRenderObjectWidget {
       );
 
   @override
-  void updateRenderObject(BuildContext context, RenderLineChart renderObject) {
+  void updateRenderObject(BuildContext context, RenderLineChart<T> renderObject) {
     renderObject
       ..data = data
       ..targetData = targetData
@@ -39,11 +39,11 @@ class LineChartLeaf extends LeafRenderObjectWidget {
 // coverage:ignore-end
 
 /// Renders our LineChart, also handles hitTest.
-class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
+class RenderLineChart<T> extends RenderBaseChart<LineTouchResponse<T>> {
   RenderLineChart(
     BuildContext context,
-    LineChartData data,
-    LineChartData targetData,
+    LineChartData<T> data,
+    LineChartData<T> targetData,
     TextScaler textScaler,
   )   : _data = data,
         _targetData = targetData,
@@ -53,17 +53,17 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
           context,
         );
 
-  LineChartData get data => _data;
-  LineChartData _data;
-  set data(LineChartData value) {
+  LineChartData<T> get data => _data;
+  LineChartData<T> _data;
+  set data(LineChartData<T> value) {
     if (_data == value) return;
     _data = value;
     markNeedsPaint();
   }
 
-  LineChartData get targetData => _targetData;
-  LineChartData _targetData;
-  set targetData(LineChartData value) {
+  LineChartData<T> get targetData => _targetData;
+  LineChartData<T> _targetData;
+  set targetData(LineChartData<T> value) {
     if (_targetData == value) return;
     _targetData = value;
     super.updateBaseTouchData(_targetData.lineTouchData);
@@ -83,10 +83,9 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
   Size? mockTestSize;
 
   @visibleForTesting
-  LineChartPainter painter = LineChartPainter();
+  LineChartPainter<T> painter = LineChartPainter();
 
-  PaintHolder<LineChartData> get paintHolder =>
-      PaintHolder(data, targetData, textScaler);
+  PaintHolder<LineChartData<T>> get paintHolder => PaintHolder(data, targetData, textScaler);
 
   @override
   void paint(PaintingContext context, Offset offset) {
@@ -102,12 +101,12 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
   }
 
   @override
-  LineTouchResponse getResponseAtLocation(Offset localPosition) {
+  LineTouchResponse<T> getResponseAtLocation(Offset localPosition) {
     final touchedSpots = painter.handleTouch(
       localPosition,
       mockTestSize ?? size,
       paintHolder,
     );
-    return LineTouchResponse(touchedSpots);
+    return LineTouchResponse<T>(touchedSpots);
   }
 }

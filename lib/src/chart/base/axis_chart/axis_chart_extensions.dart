@@ -1,9 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 
-extension FlSpotListExtension on List<FlSpot> {
+extension FlSpotListExtension<T> on List<FlSpot<T>> {
   /// Splits a line by [FlSpot.nullSpot] values inside it.
-  List<List<FlSpot>> splitByNullSpots() {
-    final barList = <List<FlSpot>>[[]];
+  List<List<FlSpot<T>>> splitByNullSpots() {
+    final barList = <List<FlSpot<T>>>[[]];
 
     // handle nullability by splitting off the list into multiple
     // separate lists when separated by nulls

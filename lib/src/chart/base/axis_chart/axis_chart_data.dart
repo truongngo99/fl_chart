@@ -13,7 +13,7 @@ import 'package:flutter/material.dart' hide Image;
 /// we use them to determine how much is the scale of chart,
 /// and calculate x and y according to the scale.
 /// each child have to set it in their constructor.
-abstract class AxisChartData extends BaseChartData with EquatableMixin {
+abstract class AxisChartData<T> extends BaseChartData<T> with EquatableMixin {
   AxisChartData({
     FlGridData? gridData,
     required this.titlesData,
@@ -320,8 +320,7 @@ class AxisTitles with EquatableMixin {
   bool get showAxisTitles => axisNameWidget != null && axisNameSize != 0;
 
   /// If there is something to show as sideTitles, it returns true
-  bool get showSideTitles =>
-      sideTitles.showTitles && sideTitles.reservedSize != 0;
+  bool get showSideTitles => sideTitles.showTitles && sideTitles.reservedSize != 0;
 
   /// Lerps a [AxisTitles] based on [t] value, check [Tween.lerp].
   static AxisTitles lerp(AxisTitles a, AxisTitles b, double t) {
@@ -440,25 +439,28 @@ class FlTitlesData with EquatableMixin {
 
 /// Represents a conceptual position in cartesian (axis based) space.
 @immutable
-class FlSpot {
+class FlSpot<T> {
   /// [x] determines cartesian (axis based) horizontally position
   /// 0 means most left point of the chart
   ///
   /// [y] determines cartesian (axis based) vertically position
   /// 0 means most bottom point of the chart
-  const FlSpot(this.x, this.y);
+  const FlSpot(this.x, this.y, {this.data});
   final double x;
   final double y;
+  final T? data;
 
   /// Copies current [FlSpot] to a new [FlSpot],
   /// and replaces provided values.
-  FlSpot copyWith({
+  FlSpot<T> copyWith({
     double? x,
     double? y,
+    T? data,
   }) {
-    return FlSpot(
+    return FlSpot<T>(
       x ?? this.x,
       y ?? this.y,
+      data: data ?? this.data,
     );
   }
 
@@ -467,10 +469,10 @@ class FlSpot {
   String toString() => '($x, $y)';
 
   /// Used for splitting lines, or maybe other concepts.
-  static const FlSpot nullSpot = FlSpot(double.nan, double.nan);
+  static const FlSpot<num> nullSpot = FlSpot<num>(double.nan, double.nan);
 
   /// Sets zero for x and y
-  static const FlSpot zero = FlSpot(0, 0);
+  static const FlSpot<num> zero = FlSpot<num>(0, 0);
 
   /// Determines if [x] or [y] is null.
   bool isNull() => this == nullSpot;
@@ -479,7 +481,7 @@ class FlSpot {
   bool isNotNull() => !isNull();
 
   /// Lerps a [FlSpot] based on [t] value, check [Tween.lerp].
-  static FlSpot lerp(FlSpot a, FlSpot b, double t) {
+  static FlSpot<T> lerp<T>(FlSpot<T> a, FlSpot<T> b, double t) {
     if (a == FlSpot.nullSpot) {
       return b;
     }
@@ -589,8 +591,7 @@ class FlGridData with EquatableMixin {
     return FlGridData(
       show: b.show,
       drawHorizontalLine: b.drawHorizontalLine,
-      horizontalInterval:
-          lerpDouble(a.horizontalInterval, b.horizontalInterval, t),
+      horizontalInterval: lerpDouble(a.horizontalInterval, b.horizontalInterval, t),
       getDrawingHorizontalLine: b.getDrawingHorizontalLine,
       checkToShowHorizontalLine: b.checkToShowHorizontalLine,
       drawVerticalLine: b.drawVerticalLine,
@@ -617,16 +618,12 @@ class FlGridData with EquatableMixin {
       show: show ?? this.show,
       drawHorizontalLine: drawHorizontalLine ?? this.drawHorizontalLine,
       horizontalInterval: horizontalInterval ?? this.horizontalInterval,
-      getDrawingHorizontalLine:
-          getDrawingHorizontalLine ?? this.getDrawingHorizontalLine,
-      checkToShowHorizontalLine:
-          checkToShowHorizontalLine ?? this.checkToShowHorizontalLine,
+      getDrawingHorizontalLine: getDrawingHorizontalLine ?? this.getDrawingHorizontalLine,
+      checkToShowHorizontalLine: checkToShowHorizontalLine ?? this.checkToShowHorizontalLine,
       drawVerticalLine: drawVerticalLine ?? this.drawVerticalLine,
       verticalInterval: verticalInterval ?? this.verticalInterval,
-      getDrawingVerticalLine:
-          getDrawingVerticalLine ?? this.getDrawingVerticalLine,
-      checkToShowVerticalLine:
-          checkToShowVerticalLine ?? this.checkToShowVerticalLine,
+      getDrawingVerticalLine: getDrawingVerticalLine ?? this.getDrawingVerticalLine,
+      checkToShowVerticalLine: checkToShowVerticalLine ?? this.checkToShowVerticalLine,
     );
   }
 
@@ -681,8 +678,7 @@ class FlLine with EquatableMixin {
     this.gradient,
     this.strokeWidth = 2,
     this.dashArray,
-  }) : color = color ??
-            ((color == null && gradient == null) ? Colors.black : null);
+  }) : color = color ?? ((color == null && gradient == null) ? Colors.black : null);
 
   /// Defines color of the line.
   final Color? color;
@@ -737,7 +733,7 @@ class FlLine with EquatableMixin {
 }
 
 /// holds information about touched spot on the axis based charts.
-abstract class TouchedSpot with EquatableMixin {
+abstract class TouchedSpot<T> with EquatableMixin {
   /// [spot]  represents the spot inside our axis based chart,
   /// 0, 0 is bottom left, and 1, 1 is top right.
   ///
@@ -750,7 +746,7 @@ abstract class TouchedSpot with EquatableMixin {
 
   /// Represents the spot inside our axis based chart,
   /// 0, 0 is bottom left, and 1, 1 is top right.
-  final FlSpot spot;
+  final FlSpot<T> spot;
 
   /// Represents the touch position in device pixels,
   /// 0, 0 is top, left, and 1, 1 is bottom right.
@@ -803,10 +799,8 @@ class RangeAnnotations with EquatableMixin {
     List<VerticalRangeAnnotation>? verticalRangeAnnotations,
   }) {
     return RangeAnnotations(
-      horizontalRangeAnnotations:
-          horizontalRangeAnnotations ?? this.horizontalRangeAnnotations,
-      verticalRangeAnnotations:
-          verticalRangeAnnotations ?? this.verticalRangeAnnotations,
+      horizontalRangeAnnotations: horizontalRangeAnnotations ?? this.horizontalRangeAnnotations,
+      verticalRangeAnnotations: verticalRangeAnnotations ?? this.verticalRangeAnnotations,
     );
   }
 
@@ -827,8 +821,7 @@ class HorizontalRangeAnnotation with EquatableMixin {
     required this.y2,
     Color? color,
     this.gradient,
-  }) : color = color ??
-            ((color == null && gradient == null) ? Colors.white : null);
+  }) : color = color ?? ((color == null && gradient == null) ? Colors.white : null);
 
   /// Determines starting point in vertical (y) axis.
   final double y1;
@@ -897,8 +890,7 @@ class VerticalRangeAnnotation with EquatableMixin {
     required this.x2,
     Color? color,
     this.gradient,
-  }) : color = color ??
-            ((color == null && gradient == null) ? Colors.white : null);
+  }) : color = color ?? ((color == null && gradient == null) ? Colors.white : null);
 
   /// Determines starting point in horizontal (x) axis.
   final double x1;
@@ -1148,8 +1140,7 @@ class HorizontalLineLabel extends FlLineLabel with EquatableMixin {
   final String Function(HorizontalLine) labelResolver;
 
   /// Returns the [HorizontalLine.y] as the drawing label.
-  static String defaultLineLabelResolver(HorizontalLine line) =>
-      line.y.toStringAsFixed(1);
+  static String defaultLineLabelResolver(HorizontalLine line) => line.y.toStringAsFixed(1);
 
   /// Lerps a [HorizontalLineLabel] based on [t] value, check [Tween.lerp].
   static HorizontalLineLabel lerp(
@@ -1158,8 +1149,7 @@ class HorizontalLineLabel extends FlLineLabel with EquatableMixin {
     double t,
   ) {
     return HorizontalLineLabel(
-      padding:
-          EdgeInsets.lerp(a.padding as EdgeInsets, b.padding as EdgeInsets, t)!,
+      padding: EdgeInsets.lerp(a.padding as EdgeInsets, b.padding as EdgeInsets, t)!,
       style: TextStyle.lerp(a.style, b.style, t),
       alignment: Alignment.lerp(a.alignment, b.alignment, t)!,
       labelResolver: b.labelResolver,
@@ -1206,8 +1196,7 @@ class VerticalLineLabel extends FlLineLabel with EquatableMixin {
   final String Function(VerticalLine) labelResolver;
 
   /// Returns the [VerticalLine.x] as the drawing label.
-  static String defaultLineLabelResolver(VerticalLine line) =>
-      line.x.toStringAsFixed(1);
+  static String defaultLineLabelResolver(VerticalLine line) => line.x.toStringAsFixed(1);
 
   /// Lerps a [VerticalLineLabel] based on [t] value, check [Tween.lerp].
   static VerticalLineLabel lerp(
@@ -1216,8 +1205,7 @@ class VerticalLineLabel extends FlLineLabel with EquatableMixin {
     double t,
   ) {
     return VerticalLineLabel(
-      padding:
-          EdgeInsets.lerp(a.padding as EdgeInsets, b.padding as EdgeInsets, t)!,
+      padding: EdgeInsets.lerp(a.padding as EdgeInsets, b.padding as EdgeInsets, t)!,
       style: TextStyle.lerp(a.style, b.style, t),
       alignment: Alignment.lerp(a.alignment, b.alignment, t)!,
       labelResolver: b.labelResolver,
@@ -1302,8 +1290,7 @@ class ExtraLinesData with EquatableMixin {
   static ExtraLinesData lerp(ExtraLinesData a, ExtraLinesData b, double t) {
     return ExtraLinesData(
       extraLinesOnTop: b.extraLinesOnTop,
-      horizontalLines:
-          lerpHorizontalLineList(a.horizontalLines, b.horizontalLines, t)!,
+      horizontalLines: lerpHorizontalLineList(a.horizontalLines, b.horizontalLines, t)!,
       verticalLines: lerpVerticalLineList(a.verticalLines, b.verticalLines, t)!,
     );
   }
@@ -1318,25 +1305,25 @@ class ExtraLinesData with EquatableMixin {
 }
 
 /// This class contains the interface that all DotPainters should conform to.
-abstract class FlDotPainter with EquatableMixin {
+abstract class FlDotPainter<T> with EquatableMixin {
   const FlDotPainter();
 
   /// This method should be overridden to draw the dot shape.
-  void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas);
+  void draw(Canvas canvas, FlSpot<T> spot, Offset offsetInCanvas);
 
   /// This method should be overridden to return the size of the shape.
-  Size getSize(FlSpot spot);
+  Size getSize(FlSpot<T> spot);
 
   /// Used to show default UIs, for example [defaultScatterTooltipItem]
   Color get mainColor;
 
-  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t);
+  FlDotPainter<T> lerp(FlDotPainter<T> a, FlDotPainter<T> b, double t);
 
   /// Used to implement touch behaviour of this dot, for example,
   /// it behaves like a square of [getSize]
   /// Check [FlDotCirclePainter.hitTest] for an example of an implementation
   bool hitTest(
-    FlSpot spot,
+    FlSpot<T> spot,
     Offset touched,
     Offset center,
     double extraThreshold,
@@ -1354,7 +1341,7 @@ abstract class FlDotPainter with EquatableMixin {
 
 /// This class is an implementation of a [FlDotPainter] that draws
 /// a circled shape
-class FlDotCirclePainter extends FlDotPainter {
+class FlDotCirclePainter<T> extends FlDotPainter<T> {
   /// The color of the circle is determined determined by [color],
   /// [radius] determines the radius of the circle.
   /// You can have a stroke line around the circle,
@@ -1381,7 +1368,7 @@ class FlDotCirclePainter extends FlDotPainter {
 
   /// Implementation of the parent class to draw the circle
   @override
-  void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
+  void draw(Canvas canvas, FlSpot<T> spot, Offset offsetInCanvas) {
     if (strokeWidth != 0.0 && strokeColor.opacity != 0.0) {
       canvas.drawCircle(
         offsetInCanvas,
@@ -1403,16 +1390,16 @@ class FlDotCirclePainter extends FlDotPainter {
 
   /// Implementation of the parent class to get the size of the circle
   @override
-  Size getSize(FlSpot spot) {
+  Size getSize(FlSpot<T> spot) {
     return Size(radius * 2, radius * 2);
   }
 
   @override
   Color get mainColor => color;
 
-  FlDotCirclePainter _lerp(
-    FlDotCirclePainter a,
-    FlDotCirclePainter b,
+  FlDotCirclePainter<T> _lerp(
+    FlDotCirclePainter<T> a,
+    FlDotCirclePainter<T> b,
     double t,
   ) {
     return FlDotCirclePainter(
@@ -1424,8 +1411,8 @@ class FlDotCirclePainter extends FlDotPainter {
   }
 
   @override
-  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t) {
-    if (a is! FlDotCirclePainter || b is! FlDotCirclePainter) {
+  FlDotPainter<T> lerp(FlDotPainter<T> a, FlDotPainter<T> b, double t) {
+    if (a is! FlDotCirclePainter<T> || b is! FlDotCirclePainter<T>) {
       return b;
     }
     return _lerp(a, b, t);
@@ -1433,7 +1420,7 @@ class FlDotCirclePainter extends FlDotPainter {
 
   @override
   bool hitTest(
-    FlSpot spot,
+    FlSpot<T> spot,
     Offset touched,
     Offset center,
     double extraThreshold,
@@ -1454,7 +1441,7 @@ class FlDotCirclePainter extends FlDotPainter {
 
 /// This class is an implementation of a [FlDotPainter] that draws
 /// a squared shape
-class FlDotSquarePainter extends FlDotPainter {
+class FlDotSquarePainter<T> extends FlDotPainter<T> {
   /// The color of the square is determined determined by [color],
   /// [size] determines the size of the square.
   /// You can have a stroke line around the square,
@@ -1481,7 +1468,7 @@ class FlDotSquarePainter extends FlDotPainter {
 
   /// Implementation of the parent class to draw the square
   @override
-  void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
+  void draw(Canvas canvas, FlSpot<T> spot, Offset offsetInCanvas) {
     if (strokeWidth != 0.0 && strokeColor.opacity != 0.0) {
       canvas.drawRect(
         Rect.fromCircle(
@@ -1507,7 +1494,7 @@ class FlDotSquarePainter extends FlDotPainter {
 
   /// Implementation of the parent class to get the size of the square
   @override
-  Size getSize(FlSpot spot) {
+  Size getSize(FlSpot<T> spot) {
     return Size(size, size);
   }
 
@@ -1523,9 +1510,9 @@ class FlDotSquarePainter extends FlDotPainter {
         strokeWidth,
       ];
 
-  FlDotSquarePainter _lerp(
-    FlDotSquarePainter a,
-    FlDotSquarePainter b,
+  FlDotSquarePainter<T> _lerp(
+    FlDotSquarePainter<T> a,
+    FlDotSquarePainter<T> b,
     double t,
   ) {
     return FlDotSquarePainter(
@@ -1537,8 +1524,8 @@ class FlDotSquarePainter extends FlDotPainter {
   }
 
   @override
-  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t) {
-    if (a is! FlDotSquarePainter || b is! FlDotSquarePainter) {
+  FlDotPainter<T> lerp(FlDotPainter<T> a, FlDotPainter<T> b, double t) {
+    if (a is! FlDotSquarePainter<T> || b is! FlDotSquarePainter<T>) {
       return b;
     }
     return _lerp(a, b, t);
@@ -1547,7 +1534,7 @@ class FlDotSquarePainter extends FlDotPainter {
 
 /// This class is an implementation of a [FlDotPainter] that draws
 /// a cross (X mark) shape
-class FlDotCrossPainter extends FlDotPainter {
+class FlDotCrossPainter<T> extends FlDotPainter<T> {
   /// The [color] and [width] properties determines the color and thickness of the cross shape,
   /// [size] determines the width and height of the shape.
   FlDotCrossPainter({
@@ -1567,7 +1554,7 @@ class FlDotCrossPainter extends FlDotPainter {
 
   /// Implementation of the parent class to draw the cross
   @override
-  void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
+  void draw(Canvas canvas, FlSpot<T> spot, Offset offsetInCanvas) {
     final path = Path()
       ..moveTo(offsetInCanvas.dx, offsetInCanvas.dy)
       ..relativeMoveTo(-size / 2, -size / 2)
@@ -1586,16 +1573,16 @@ class FlDotCrossPainter extends FlDotPainter {
 
   /// Implementation of the parent class to get the size of the circle
   @override
-  Size getSize(FlSpot spot) {
+  Size getSize(FlSpot<T> spot) {
     return Size(size, size);
   }
 
   @override
   Color get mainColor => color;
 
-  FlDotCrossPainter _lerp(
-    FlDotCrossPainter a,
-    FlDotCrossPainter b,
+  FlDotCrossPainter<T> _lerp(
+    FlDotCrossPainter<T> a,
+    FlDotCrossPainter<T> b,
     double t,
   ) {
     return FlDotCrossPainter(
@@ -1606,8 +1593,8 @@ class FlDotCrossPainter extends FlDotPainter {
   }
 
   @override
-  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t) {
-    if (a is! FlDotCrossPainter || b is! FlDotCrossPainter) {
+  FlDotPainter<T> lerp(FlDotPainter<T> a, FlDotPainter<T> b, double t) {
+    if (a is! FlDotCrossPainter<T> || b is! FlDotCrossPainter<T>) {
       return b;
     }
     return _lerp(a, b, t);
