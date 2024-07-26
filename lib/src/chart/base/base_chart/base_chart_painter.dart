@@ -4,20 +4,20 @@ import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/material.dart';
 
 /// Base class of our painters.
-class BaseChartPainter<D extends BaseChartData> {
+class BaseChartPainter<T,D extends BaseChartData<T>> {
   /// Draws some basic elements
   const BaseChartPainter();
 
   // Paints [BaseChartData] into the provided canvas.
   void paint(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<D> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T,D> holder,
   ) {}
 }
 
 /// Holds data for painting on canvas
-class PaintHolder<Data extends BaseChartData> {
+class PaintHolder<T,Data extends BaseChartData<T>> {
   /// Holds data for painting on canvas
   const PaintHolder(this.data, this.targetData, this.textScaler);
 

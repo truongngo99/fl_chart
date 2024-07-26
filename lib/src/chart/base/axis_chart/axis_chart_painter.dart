@@ -13,8 +13,8 @@ import 'package:flutter/material.dart';
 /// in child classes -> [BarChartPainter], [LineChartPainter]
 /// [dataList] is the currently showing data (it may produced by an animation using lerp function),
 /// [targetData] is the target data, that animation is going to show (if animating)
-abstract class AxisChartPainter<D extends AxisChartData>
-    extends BaseChartPainter<D> {
+abstract class AxisChartPainter<T, D extends AxisChartData<T>>
+    extends BaseChartPainter<T,D> {
   AxisChartPainter() {
     _gridPaint = Paint()..style = PaintingStyle.stroke;
 
@@ -38,8 +38,8 @@ abstract class AxisChartPainter<D extends AxisChartData>
   @override
   void paint(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<D> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T,D> holder,
   ) {
     super.paint(context, canvasWrapper, holder);
     drawBackground(canvasWrapper, holder);
@@ -48,7 +48,7 @@ abstract class AxisChartPainter<D extends AxisChartData>
   }
 
   @visibleForTesting
-  void drawGrid(CanvasWrapper canvasWrapper, PaintHolder<D> holder) {
+  void drawGrid(CanvasWrapper<T> canvasWrapper, PaintHolder<T,D> holder) {
     final data = holder.data;
     if (!data.gridData.show) {
       return;
@@ -150,7 +150,7 @@ abstract class AxisChartPainter<D extends AxisChartData>
 
   /// This function draws a colored background behind the chart.
   @visibleForTesting
-  void drawBackground(CanvasWrapper canvasWrapper, PaintHolder<D> holder) {
+  void drawBackground(CanvasWrapper<T> canvasWrapper, PaintHolder<T,D> holder) {
     final data = holder.data;
     if (data.backgroundColor.opacity == 0.0) {
       return;
@@ -165,7 +165,7 @@ abstract class AxisChartPainter<D extends AxisChartData>
   }
 
   @visibleForTesting
-  void drawRangeAnnotation(CanvasWrapper canvasWrapper, PaintHolder<D> holder) {
+  void drawRangeAnnotation(CanvasWrapper<T> canvasWrapper, PaintHolder<T, D> holder) {
     final data = holder.data;
     final viewSize = canvasWrapper.size;
 
@@ -213,8 +213,8 @@ abstract class AxisChartPainter<D extends AxisChartData>
 
   void drawExtraLines(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<D> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, D> holder,
   ) {
     super.paint(context, canvasWrapper, holder);
     final data = holder.data;
@@ -231,8 +231,8 @@ abstract class AxisChartPainter<D extends AxisChartData>
 
   void drawHorizontalLines(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<D> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, D> holder,
     Size viewSize,
   ) {
     for (final line in holder.data.extraLinesData.horizontalLines) {
@@ -338,8 +338,8 @@ abstract class AxisChartPainter<D extends AxisChartData>
 
   void drawVerticalLines(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<D> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, D> holder,
     Size viewSize,
   ) {
     for (final line in holder.data.extraLinesData.verticalLines) {
@@ -447,7 +447,7 @@ abstract class AxisChartPainter<D extends AxisChartData>
   /// With this function we can convert our [FlSpot] x
   /// to the view base axis x .
   /// the view 0, 0 is on the top/left, but the spots is bottom/left
-  double getPixelX(double spotX, Size viewSize, PaintHolder<D> holder) {
+  double getPixelX(double spotX, Size viewSize, PaintHolder<T, D> holder) {
     final data = holder.data;
     final deltaX = data.maxX - data.minX;
     if (deltaX == 0.0) {
@@ -458,7 +458,7 @@ abstract class AxisChartPainter<D extends AxisChartData>
 
   /// With this function we can convert our [FlSpot] y
   /// to the view base axis y.
-  double getPixelY(double spotY, Size viewSize, PaintHolder<D> holder) {
+  double getPixelY(double spotY, Size viewSize, PaintHolder<T, D> holder) {
     final data = holder.data;
     final deltaY = data.maxY - data.minY;
     if (deltaY == 0.0) {

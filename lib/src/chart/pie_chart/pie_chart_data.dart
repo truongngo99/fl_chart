@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 ///
 /// It holds data needed to draw a pie chart,
 /// including pie sections, colors, ...
-class PieChartData extends BaseChartData with EquatableMixin {
+class PieChartData<T> extends BaseChartData<T> with EquatableMixin {
   /// [PieChart] draws some [sections] in a circle,
   /// and applies free space with radius [centerSpaceRadius],
   /// and color [centerSpaceColor] in the center of the circle,
@@ -70,7 +70,7 @@ class PieChartData extends BaseChartData with EquatableMixin {
 
   /// Copies current [PieChartData] to a new [PieChartData],
   /// and replaces provided values.
-  PieChartData copyWith({
+  PieChartData<T> copyWith({
     List<PieChartSectionData>? sections,
     double? centerSpaceRadius,
     Color? centerSpaceColor,
@@ -92,8 +92,8 @@ class PieChartData extends BaseChartData with EquatableMixin {
 
   /// Lerps a [BaseChartData] based on [t] value, check [Tween.lerp].
   @override
-  PieChartData lerp(BaseChartData a, BaseChartData b, double t) {
-    if (a is PieChartData && b is PieChartData) {
+  PieChartData<T> lerp(BaseChartData<T> a, BaseChartData<T> b, double t) {
+    if (a is PieChartData<T> && b is PieChartData<T>) {
       return PieChartData(
         borderData: FlBorderData.lerp(a.borderData, b.borderData, t),
         centerSpaceColor: Color.lerp(a.centerSpaceColor, b.centerSpaceColor, t),
@@ -373,11 +373,11 @@ class PieTouchResponse extends BaseTouchResponse {
 }
 
 /// It lerps a [PieChartData] to another [PieChartData] (handles animation for updating values)
-class PieChartDataTween extends Tween<PieChartData> {
-  PieChartDataTween({required PieChartData begin, required PieChartData end})
+class PieChartDataTween<T> extends Tween<PieChartData<T>> {
+  PieChartDataTween({required PieChartData<T> begin, required PieChartData<T> end})
       : super(begin: begin, end: end);
 
   /// Lerps a [PieChartData] based on [t] value, check [Tween.lerp].
   @override
-  PieChartData lerp(double t) => begin!.lerp(begin!, end!, t);
+  PieChartData<T> lerp(double t) => begin!.lerp(begin!, end!, t);
 }

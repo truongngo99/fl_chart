@@ -41,7 +41,7 @@ class RadarChartTitle {
 ///
 /// It holds data needed to draw a radar chart,
 /// including radar dataSets, colors, ...
-class RadarChartData extends BaseChartData with EquatableMixin {
+class RadarChartData<T> extends BaseChartData<T> with EquatableMixin {
   /// [RadarChart] draws some [dataSets] in a radar-shaped chart.
   /// it fills the radar area with [radarBackgroundColor]
   /// and draws radar border with [radarBorderData]
@@ -220,8 +220,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
 
   /// Lerps a [BaseChartData] based on [t] value, check [Tween.lerp].
   @override
-  RadarChartData lerp(BaseChartData a, BaseChartData b, double t) {
-    if (a is RadarChartData && b is RadarChartData) {
+  RadarChartData<T> lerp(BaseChartData<T> a, BaseChartData<T> b, double t) {
+    if (a is RadarChartData<T> && b is RadarChartData<T>) {
       return RadarChartData(
         dataSets: lerpRadarDataSetList(a.dataSets, b.dataSets, t),
         radarBackgroundColor:
@@ -475,13 +475,13 @@ class RadarTouchedSpot extends TouchedSpot with EquatableMixin {
 }
 
 /// It lerps a [RadarChartData] to another [RadarChartData] (handles animation for updating values)
-class RadarChartDataTween extends Tween<RadarChartData> {
+class RadarChartDataTween<T> extends Tween<RadarChartData<T>> {
   RadarChartDataTween({
-    required RadarChartData begin,
-    required RadarChartData end,
+    required RadarChartData<T> begin,
+    required RadarChartData<T> end,
   }) : super(begin: begin, end: end);
 
   /// Lerps a [RadarChartData] based on [t] value, check [Tween.lerp].
   @override
-  RadarChartData lerp(double t) => begin!.lerp(begin!, end!, t);
+  RadarChartData<T> lerp(double t) => begin!.lerp(begin!, end!, t);
 }

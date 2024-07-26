@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 ///
 /// It holds data needed to draw a bar chart,
 /// including bar lines, colors, spaces, touches, ...
-class BarChartData extends AxisChartData with EquatableMixin {
+class BarChartData<T> extends AxisChartData<T> with EquatableMixin {
   /// [BarChart] draws some [barGroups] and aligns them using [alignment],
   /// if [alignment] is [BarChartAlignment.center], you can define [groupsSpace]
   /// to apply space between them.
@@ -38,7 +38,7 @@ class BarChartData extends AxisChartData with EquatableMixin {
     double? groupsSpace,
     BarChartAlignment? alignment,
     FlTitlesData? titlesData,
-    BarTouchData? barTouchData,
+    BarTouchData<T>? barTouchData,
     double? maxY,
     double? minY,
     super.baselineY,
@@ -58,7 +58,7 @@ class BarChartData extends AxisChartData with EquatableMixin {
               ),
           gridData: gridData ?? const FlGridData(),
           rangeAnnotations: rangeAnnotations ?? const RangeAnnotations(),
-          touchData: barTouchData ?? BarTouchData(),
+          touchData: barTouchData ?? BarTouchData<T>(),
           extraLinesData: extraLinesData ?? const ExtraLinesData(),
           minX: 0,
           maxX: 1,
@@ -76,17 +76,17 @@ class BarChartData extends AxisChartData with EquatableMixin {
   final BarChartAlignment alignment;
 
   /// Handles touch behaviors and responses.
-  final BarTouchData barTouchData;
+  final BarTouchData<T> barTouchData;
 
   /// Copies current [BarChartData] to a new [BarChartData],
   /// and replaces provided values.
-  BarChartData copyWith({
+  BarChartData<T> copyWith({
     List<BarChartGroupData>? barGroups,
     double? groupsSpace,
     BarChartAlignment? alignment,
     FlTitlesData? titlesData,
     RangeAnnotations? rangeAnnotations,
-    BarTouchData? barTouchData,
+    BarTouchData<T>? barTouchData,
     FlGridData? gridData,
     FlBorderData? borderData,
     double? maxY,
@@ -114,8 +114,8 @@ class BarChartData extends AxisChartData with EquatableMixin {
 
   /// Lerps a [BaseChartData] based on [t] value, check [Tween.lerp].
   @override
-  BarChartData lerp(BaseChartData a, BaseChartData b, double t) {
-    if (a is BarChartData && b is BarChartData) {
+  BarChartData<T> lerp(BaseChartData<T> a, BaseChartData<T> b, double t) {
+    if (a is BarChartData<T> && b is BarChartData<T>) {
       return BarChartData(
         barGroups: lerpBarChartGroupDataList(a.barGroups, b.barGroups, t),
         groupsSpace: lerpDouble(a.groupsSpace, b.groupsSpace, t),
@@ -584,7 +584,7 @@ class BackgroundBarChartRodData with EquatableMixin {
 /// There is a touch flow, explained [here](https://github.com/imaNNeo/fl_chart/blob/main/repo_files/documentations/handle_touches.md)
 /// in a simple way, each chart's renderer captures the touch events, and passes the pointerEvent
 /// to the painter, and gets touched spot, and wraps it into a concrete [BarTouchResponse].
-class BarTouchData extends FlTouchData<BarTouchResponse> with EquatableMixin {
+class BarTouchData<T> extends FlTouchData<BarTouchResponse<T>> with EquatableMixin {
   /// You can disable or enable the touch system using [enabled] flag,
   ///
   /// [touchCallback] notifies you about the happened touch/pointer events.
@@ -603,8 +603,8 @@ class BarTouchData extends FlTouchData<BarTouchResponse> with EquatableMixin {
   /// on [BarChartRodData.backDrawRodData] too (by default it only works on the main rods).
   BarTouchData({
     bool? enabled,
-    BaseTouchCallback<BarTouchResponse>? touchCallback,
-    MouseCursorResolver<BarTouchResponse>? mouseCursorResolver,
+    BaseTouchCallback<BarTouchResponse<T>>? touchCallback,
+    MouseCursorResolver<BarTouchResponse<T>>? mouseCursorResolver,
     Duration? longPressDuration,
     BarTouchTooltipData? touchTooltipData,
     EdgeInsets? touchExtraThreshold,
@@ -636,10 +636,10 @@ class BarTouchData extends FlTouchData<BarTouchResponse> with EquatableMixin {
 
   /// Copies current [BarTouchData] to a new [BarTouchData],
   /// and replaces provided values.
-  BarTouchData copyWith({
+  BarTouchData<T> copyWith({
     bool? enabled,
-    BaseTouchCallback<BarTouchResponse>? touchCallback,
-    MouseCursorResolver<BarTouchResponse>? mouseCursorResolver,
+    BaseTouchCallback<BarTouchResponse<T>>? touchCallback,
+    MouseCursorResolver<BarTouchResponse<T>>? mouseCursorResolver,
     Duration? longPressDuration,
     BarTouchTooltipData? touchTooltipData,
     EdgeInsets? touchExtraThreshold,
@@ -872,18 +872,18 @@ Color defaultBarTooltipColor(BarChartGroupData group) {
 ///
 /// You can override [BarTouchData.touchCallback] to handle touch events,
 /// it gives you a [BarTouchResponse] and you can do whatever you want.
-class BarTouchResponse extends BaseTouchResponse {
+class BarTouchResponse<T> extends BaseTouchResponse {
   /// If touch happens, [BarChart] processes it internally and passes out a BarTouchedSpot
   /// that contains a [spot], it gives you information about the touched spot.
   BarTouchResponse(this.spot) : super();
 
   /// Gives information about the touched spot
-  final BarTouchedSpot? spot;
+  final BarTouchedSpot<T>? spot;
 
   /// Copies current [BarTouchResponse] to a new [BarTouchResponse],
   /// and replaces provided values.
-  BarTouchResponse copyWith({
-    BarTouchedSpot? spot,
+  BarTouchResponse<T> copyWith({
+    BarTouchedSpot<T>? spot,
   }) {
     return BarTouchResponse(
       spot ?? this.spot,
@@ -892,7 +892,7 @@ class BarTouchResponse extends BaseTouchResponse {
 }
 
 /// It gives you information about the touched spot.
-class BarTouchedSpot extends TouchedSpot with EquatableMixin {
+class BarTouchedSpot<T> extends TouchedSpot<T> with EquatableMixin {
   /// When touch happens, a [BarTouchedSpot] returns as a output,
   /// it tells you where the touch happened.
   /// [touchedBarGroup], and [touchedBarGroupIndex] tell you in which group touch happened,
@@ -908,7 +908,7 @@ class BarTouchedSpot extends TouchedSpot with EquatableMixin {
     this.touchedRodDataIndex,
     this.touchedStackItem,
     this.touchedStackItemIndex,
-    FlSpot spot,
+    FlSpot<T> spot,
     Offset offset,
   ) : super(spot, offset);
   final BarChartGroupData touchedBarGroup;
@@ -938,11 +938,11 @@ class BarTouchedSpot extends TouchedSpot with EquatableMixin {
 }
 
 /// It lerps a [BarChartData] to another [BarChartData] (handles animation for updating values)
-class BarChartDataTween extends Tween<BarChartData> {
-  BarChartDataTween({required BarChartData begin, required BarChartData end})
+class BarChartDataTween<D> extends Tween<BarChartData<D>> {
+  BarChartDataTween({required BarChartData<D> begin, required BarChartData<D> end})
       : super(begin: begin, end: end);
 
   /// Lerps a [BarChartData] based on [t] value, check [Tween.lerp].
   @override
-  BarChartData lerp(double t) => begin!.lerp(begin!, end!, t);
+  BarChartData<D> lerp(double t) => begin!.lerp(begin!, end!, t);
 }

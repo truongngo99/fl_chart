@@ -5,7 +5,7 @@ import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_scaffold_widget.da
 import 'package:flutter/cupertino.dart';
 
 /// Renders a bar chart as a widget, using provided [BarChartData].
-class BarChart extends ImplicitlyAnimatedWidget {
+class BarChart<T> extends ImplicitlyAnimatedWidget {
   /// [data] determines how the [BarChart] should be look like,
   /// when you make any change in the [BarChartData], it updates
   /// new values with animation, and duration is [swapAnimationDuration].
@@ -23,7 +23,7 @@ class BarChart extends ImplicitlyAnimatedWidget {
         );
 
   /// Determines how the [BarChart] should be look like.
-  final BarChartData data;
+  final BarChartData<T> data;
 
   /// We pass this key to our renderers which are supposed to
   /// render the chart itself (without anything around the chart).
@@ -31,17 +31,17 @@ class BarChart extends ImplicitlyAnimatedWidget {
 
   /// Creates a [_BarChartState]
   @override
-  _BarChartState createState() => _BarChartState();
+  _BarChartState<T> createState() => _BarChartState();
 }
 
-class _BarChartState extends AnimatedWidgetBaseState<BarChart> {
+class _BarChartState<T> extends AnimatedWidgetBaseState<BarChart<T>> {
   /// we handle under the hood animations (implicit animations) via this tween,
   /// it lerps between the old [BarChartData] to the new one.
-  BarChartDataTween? _barChartDataTween;
+  BarChartDataTween<T>? _barChartDataTween;
 
   /// If [BarTouchData.handleBuiltInTouches] is true, we override the callback to handle touches internally,
   /// but we need to keep the provided callback to notify it too.
-  BaseTouchCallback<BarTouchResponse>? _providedTouchCallback;
+  BaseTouchCallback<BarTouchResponse<T>>? _providedTouchCallback;
 
   final Map<int, List<int>> _showingTouchedTooltips = {};
 
@@ -53,7 +53,7 @@ class _BarChartState extends AnimatedWidgetBaseState<BarChart> {
 
     return AxisChartScaffoldWidget(
       data: showingData,
-      chart: BarChartLeaf(
+      chart: BarChartLeaf<T>(
         data: _withTouchedIndicators(_barChartDataTween!.evaluate(animation)),
         targetData: _withTouchedIndicators(showingData),
         key: widget.chartRendererKey,
@@ -61,7 +61,7 @@ class _BarChartState extends AnimatedWidgetBaseState<BarChart> {
     );
   }
 
-  BarChartData _withTouchedIndicators(BarChartData barChartData) {
+  BarChartData<T> _withTouchedIndicators(BarChartData<T> barChartData) {
     if (!barChartData.barTouchData.enabled ||
         !barChartData.barTouchData.handleBuiltInTouches) {
       return barChartData;
@@ -83,7 +83,7 @@ class _BarChartState extends AnimatedWidgetBaseState<BarChart> {
     );
   }
 
-  BarChartData _getData() {
+  BarChartData<T> _getData() {
     var newData = widget.data;
     if (newData.minY.isNaN || newData.maxY.isNaN) {
       final values = _barChartHelper.calculateMaxAxisValues(newData.barGroups);
@@ -106,7 +106,7 @@ class _BarChartState extends AnimatedWidgetBaseState<BarChart> {
 
   void _handleBuiltInTouch(
     FlTouchEvent event,
-    BarTouchResponse? touchResponse,
+    BarTouchResponse<T>? touchResponse,
   ) {
     if (!mounted) {
       return;
@@ -135,7 +135,7 @@ class _BarChartState extends AnimatedWidgetBaseState<BarChart> {
       _barChartDataTween,
       _getData(),
       (dynamic value) =>
-          BarChartDataTween(begin: value as BarChartData, end: widget.data),
-    ) as BarChartDataTween?;
+          BarChartDataTween<T>(begin: value as BarChartData<T>, end: widget.data),
+    ) as BarChartDataTween<T>?;
   }
 }

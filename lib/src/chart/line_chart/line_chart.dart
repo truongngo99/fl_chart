@@ -146,9 +146,3 @@ class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
     ) as LineChartDataTween<T>?;
   }
 }
-
-class CustomFlDot<T> extends FlDotData {
-  final T data;
-
-  CustomFlDot(this.data);
-}

@@ -85,7 +85,7 @@ class RenderLineChart<T> extends RenderBaseChart<LineTouchResponse<T>> {
   @visibleForTesting
   LineChartPainter<T> painter = LineChartPainter();
 
-  PaintHolder<LineChartData<T>> get paintHolder => PaintHolder(data, targetData, textScaler);
+  PaintHolder<T,LineChartData<T>> get paintHolder => PaintHolder(data, targetData, textScaler);
 
   @override
   void paint(PaintingContext context, Offset offset) {

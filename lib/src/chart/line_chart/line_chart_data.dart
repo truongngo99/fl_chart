@@ -45,7 +45,7 @@ class LineChartData<T> extends AxisChartData<T> with EquatableMixin {
     this.betweenBarsData = const [],
     super.titlesData = const FlTitlesData(),
     super.extraLinesData = const ExtraLinesData(),
-    this.lineTouchData = const LineTouchData(),
+    required this.lineTouchData,
     this.showingTooltipIndicators = const [],
     super.gridData = const FlGridData(),
     super.borderData,
@@ -233,7 +233,7 @@ class LineChartBarData<T> with EquatableMixin {
     this.isStrokeJoinRound = false,
     BarAreaData<T>? belowBarData,
     BarAreaData<T>? aboveBarData,
-    this.dotData = const FlDotData(),
+    required this.dotData,
     this.showingIndicators = const [],
     this.dashArray,
     this.shadow = const Shadow(color: Colors.transparent),
@@ -718,14 +718,14 @@ Color _defaultGetDotStrokeColor<T>(
 /// [LineChartBarData] is the chart's bar.
 /// [int] is the index position of the spot.
 /// It should return a [FlDotPainter] that needs to be used for drawing target.
-typedef GetDotPainterCallback = FlDotPainter<T> Function<T>(
+typedef GetDotPainterCallback<T> = FlDotPainter<T> Function(
   FlSpot<T>,
   double,
   LineChartBarData<T>,
   int,
 );
 
-FlDotPainter<T> _defaultGetDotPainter<T>(
+FlDotPainter<T> defaultGetDotPainter<T>(
   FlSpot<T> spot,
   double xPercentage,
   LineChartBarData<T> bar,
@@ -746,23 +746,23 @@ class FlDotData<T> with EquatableMixin {
   /// override [checkToShowDot] to handle it in your way.
   const FlDotData({
     this.show = true,
-    this.checkToShowDot = showAllDots,
-    this.getDotPainter = _defaultGetDotPainter,
+    required this.checkToShowDot,
+    required this.getDotPainter,
   });
 
   /// Determines show or hide all dots.
   final bool show;
 
   /// Checks to show or hide an individual dot.
-  final CheckToShowDot checkToShowDot;
+  final CheckToShowDot<T> checkToShowDot;
 
   /// Callback which is called to set the painter of the given [FlSpot].
   /// The [FlSpot] is provided as parameter to this callback
-  final GetDotPainterCallback getDotPainter;
+  final GetDotPainterCallback<T> getDotPainter;
 
   /// Lerps a [FlDotData] based on [t] value, check [Tween.lerp].
   static FlDotData<T> lerp<T>(FlDotData<T> a, FlDotData<T> b, double t) {
-    return FlDotData(
+    return FlDotData<T>(
       show: b.show,
       checkToShowDot: b.checkToShowDot,
       getDotPainter: b.getDotPainter,
@@ -782,13 +782,12 @@ class FlDotData<T> with EquatableMixin {
 ///
 /// It gives you the checking [FlSpot] and you should decide to
 /// show or hide the dot on this spot by returning true or false.
-typedef CheckToShowDot = bool Function<T>(FlSpot<T> spot, LineChartBarData<T> barData);
+typedef CheckToShowDot<T> = bool Function(FlSpot<T> spot, LineChartBarData<T> barData);
 
 /// Shows all dots on spots.
 bool showAllDots<T>(FlSpot<T> spot, LineChartBarData<T> barData) {
   return true;
 }
-
 enum LabelDirection { horizontal, vertical }
 
 /// Shows a text label
@@ -855,13 +854,13 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
   /// You can customize this tooltip using [touchTooltipData], indicator lines starts from position
   /// controlled by [getTouchLineStart] and ends at position controlled by [getTouchLineEnd].
   /// If you need to have a distance threshold for handling touches, use [touchSpotThreshold].
-  const LineTouchData({
+   LineTouchData({
     bool enabled = true,
     BaseTouchCallback<LineTouchResponse<T>>? touchCallback,
     MouseCursorResolver<LineTouchResponse<T>>? mouseCursorResolver,
     Duration? longPressDuration,
-    this.touchTooltipData = const LineTouchTooltipData(),
-    this.getTouchedSpotIndicator = defaultTouchedIndicators,
+    required this.touchTooltipData,
+    required this.getTouchedSpotIndicator,
     this.touchSpotThreshold = 10,
     this.distanceCalculator = _xDistance,
     this.handleBuiltInTouches = true,
@@ -878,7 +877,7 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
   final LineTouchTooltipData<T> touchTooltipData;
 
   /// Configs of how touch indicator looks like.
-  final GetTouchedSpotIndicator getTouchedSpotIndicator;
+  final GetTouchedSpotIndicator<T> getTouchedSpotIndicator;
 
   /// Distance threshold to handle the touch event.
   final double touchSpotThreshold;
@@ -906,7 +905,7 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
     MouseCursorResolver<LineTouchResponse<T>>? mouseCursorResolver,
     Duration? longPressDuration,
     LineTouchTooltipData<T>? touchTooltipData,
-    GetTouchedSpotIndicator? getTouchedSpotIndicator,
+    GetTouchedSpotIndicator<T>? getTouchedSpotIndicator,
     double? touchSpotThreshold,
     CalculateTouchDistance? distanceCalculator,
     GetTouchLineY? getTouchLineStart,
@@ -951,7 +950,7 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
 /// in the given [barData], you should return a list of [TouchedSpotIndicatorData],
 /// length of this list should be equal to the [spotIndexes.length],
 /// each [TouchedSpotIndicatorData] determines the look of showing indicator.
-typedef GetTouchedSpotIndicator = List<TouchedSpotIndicatorData<T>?> Function<T>(
+typedef GetTouchedSpotIndicator<T> = List<TouchedSpotIndicatorData<T>?> Function(
   LineChartBarData<T> barData,
   List<int> spotIndexes,
 );
@@ -993,7 +992,8 @@ List<TouchedSpotIndicatorData<T>> defaultTouchedIndicators<T>(
     }
 
     final dotData = FlDotData<T>(
-      getDotPainter: <T>(spot, percent, bar, index) => _defaultGetDotPainter<T>(spot, percent, bar, index, size: dotSize),
+      getDotPainter: (spot, percent, bar, index) => defaultGetDotPainter(spot, percent, bar, index, size: dotSize),
+      checkToShowDot: showAllDots,
     );
 
     return TouchedSpotIndicatorData<T>(flLine, dotData);
@@ -1025,14 +1025,14 @@ class LineTouchTooltipData<T> with EquatableMixin {
   /// Sometimes, [LineChart] shows the tooltip outside of the chart,
   /// you can set [fitInsideHorizontally] true to force it to shift inside the chart horizontally,
   /// also you can set [fitInsideVertically] true to force it to shift inside the chart vertically.
-  const LineTouchTooltipData({
+   const LineTouchTooltipData({
     this.tooltipRoundedRadius = 4,
     this.tooltipPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     this.tooltipMargin = 16,
     this.tooltipHorizontalAlignment = FLHorizontalAlignment.center,
     this.tooltipHorizontalOffset = 0,
     this.maxContentWidth = 120,
-    this.getTooltipItems = defaultLineTooltipItem,
+    required this.getTooltipItems,
     this.getTooltipColor = defaultLineTooltipColor,
     this.fitInsideHorizontally = false,
     this.fitInsideVertically = false,
@@ -1040,6 +1040,7 @@ class LineTouchTooltipData<T> with EquatableMixin {
     this.rotateAngle = 0.0,
     this.tooltipBorder = BorderSide.none,
   });
+
 
   /// Sets a rounded radius for the tooltip.
   final double tooltipRoundedRadius;
@@ -1060,7 +1061,7 @@ class LineTouchTooltipData<T> with EquatableMixin {
   final double maxContentWidth;
 
   /// Retrieves data for showing content inside the tooltip.
-  final GetLineTooltipItems getTooltipItems;
+  final GetLineTooltipItems<T> getTooltipItems;
 
   /// Forces the tooltip to shift horizontally inside the chart, if overflow happens.
   final bool fitInsideHorizontally;
@@ -1078,7 +1079,7 @@ class LineTouchTooltipData<T> with EquatableMixin {
   final BorderSide tooltipBorder;
 
   // /// Retrieves data for setting background color of the tooltip.
-  final GetLineTooltipColor getTooltipColor;
+  final GetLineTooltipColor<T> getTooltipColor;
 
   /// Used for equality check, see [EquatableMixin].
   @override
@@ -1106,19 +1107,21 @@ class LineTouchTooltipData<T> with EquatableMixin {
 /// then you should and pass your custom [LineTooltipItem] list
 /// (length should be equal to the [touchedSpots.length]),
 /// to show inside the tooltip popup.
-typedef GetLineTooltipItems = List<LineTooltipItem?> Function<T>(
+typedef GetLineTooltipItems<T> = List<LineTooltipItem<T>?> Function(
   List<LineBarSpot<T>> touchedSpots,
 );
 
+
+
 /// Default implementation for [LineTouchTooltipData.getTooltipItems].
-List<LineTooltipItem> defaultLineTooltipItem<T>(List<LineBarSpot<T>> touchedSpots) {
+List<LineTooltipItem<T>?> defaultLineTooltipItem<T>(List<LineBarSpot<T>> touchedSpots) {
   return touchedSpots.map((LineBarSpot<T> touchedSpot) {
     final textStyle = TextStyle(
       color: touchedSpot.bar.gradient?.colors.first ?? touchedSpot.bar.color ?? Colors.blueGrey,
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    return LineTooltipItem(touchedSpot.y.toString(), textStyle);
+    return LineTooltipItem<T>(touchedSpot.y.toString(), textStyle);
   }).toList();
 }
 
@@ -1128,12 +1131,12 @@ List<LineTooltipItem> defaultLineTooltipItem<T>(List<LineBarSpot<T>> touchedSpot
 /// [touchedSpot] object that touch happened on, then you should and pass your custom [Color] list
 /// (length should be equal to the [touchedSpots.length]), to set background color
 /// of tooltip popup.
-typedef GetLineTooltipColor = Color Function<T>(
+typedef GetLineTooltipColor<T> = Color Function(
   LineBarSpot<T> touchedSpot,
 );
 
 /// Default implementation for [LineTouchTooltipData.getTooltipColor].
-Color defaultLineTooltipColor<T>(LineBarSpot<T> touchedSpot) {
+Color defaultLineTooltipColor(LineBarSpot touchedSpot) {
   return Colors.blueGrey.darken(15);
 }
 
@@ -1184,7 +1187,7 @@ class TouchLineBarSpot<T> extends LineBarSpot<T> {
 }
 
 /// Holds data of showing each row item in the tooltip popup.
-class LineTooltipItem with EquatableMixin {
+class LineTooltipItem<T> with EquatableMixin {
   /// Shows a [text] with [textStyle], [textDirection],
   /// and optional [children] as a row in the tooltip popup.
   const LineTooltipItem(

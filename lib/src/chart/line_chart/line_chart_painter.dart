@@ -12,7 +12,7 @@ import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Paints [LineChartData] in the canvas, it can be used in a [CustomPainter]
-class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
+class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
   /// Paints [dataList] into canvas, it is the animating [LineChartData],
   /// [targetData] is the animation's target and remains the same
   /// during animation, then we should use it  when we need to show
@@ -58,8 +58,8 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   @override
   void paint(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<LineChartData<T>> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T,LineChartData<T>> holder,
   ) {
     final data = holder.data;
     if (data.lineBarsData.isEmpty) {
@@ -168,8 +168,8 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
 
   @visibleForTesting
   void clipToBorder(
-    CanvasWrapper canvasWrapper,
-    PaintHolder<LineChartData<T>> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final data = holder.data;
     final viewSize = canvasWrapper.size;
@@ -203,9 +203,9 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
 
   @visibleForTesting
   void drawBarLine(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     LineChartBarData<T> barData,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final viewSize = canvasWrapper.size;
     final barList = barData.spots.splitByNullSpots();
@@ -257,10 +257,10 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
 
   @visibleForTesting
   void drawBetweenBarsArea(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     LineChartData<T> data,
     BetweenBarsData betweenBarsData,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final viewSize = canvasWrapper.size;
     final fromBarData = data.lineBarsData[betweenBarsData.fromIndex];
@@ -318,9 +318,9 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
 
   @visibleForTesting
   void drawDots(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     LineChartBarData<T> barData,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     if (!barData.dotData.show || barData.spots.isEmpty) {
       return;
@@ -344,9 +344,9 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
 
   @visibleForTesting
   void drawTouchedSpotsIndicator(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     List<LineIndexDrawingInfo<T>> lineIndexDrawingInfo,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     if (lineIndexDrawingInfo.isEmpty) {
       return;
@@ -435,7 +435,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
     Size viewSize,
     LineChartBarData<T> barData,
     List<FlSpot<T>> barSpots,
-    PaintHolder<LineChartData<T>> holder, {
+    PaintHolder<T, LineChartData<T>> holder, {
     Path? appendToPath,
   }) {
     if (barData.isStepLineChart) {
@@ -470,7 +470,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
     Size viewSize,
     LineChartBarData<T> barData,
     List<FlSpot<T>> barSpots,
-    PaintHolder<LineChartData<T>> holder, {
+    PaintHolder<T, LineChartData<T>> holder, {
     Path? appendToPath,
   }) {
     final path = appendToPath ?? Path();
@@ -548,7 +548,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
     Size viewSize,
     LineChartBarData<T> barData,
     List<FlSpot<T>> barSpots,
-    PaintHolder<LineChartData<T>> holder, {
+    PaintHolder<T, LineChartData<T>> holder, {
     Path? appendToPath,
   }) {
     final path = appendToPath ?? Path();
@@ -602,7 +602,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
     LineChartBarData<T> barData,
     Path barPath,
     List<FlSpot<T>> barSpots,
-    PaintHolder<LineChartData<T>> holder, {
+    PaintHolder<T, LineChartData<T>> holder, {
     bool fillCompletely = false,
   }) {
     final belowBarPath = Path.from(barPath);
@@ -646,7 +646,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
     LineChartBarData<T> barData,
     Path barPath,
     List<FlSpot<T>> barSpots,
-    PaintHolder<LineChartData<T>> holder, {
+    PaintHolder<T, LineChartData<T>> holder, {
     bool fillCompletely = false,
   }) {
     final aboveBarPath = Path.from(barPath);
@@ -685,10 +685,10 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   /// then to fix the problem we use [filledAboveBarPath] to clear the above section from this draw.
   @visibleForTesting
   void drawBelowBar(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     Path belowBarPath,
     Path filledAboveBarPath,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
     LineChartBarData<T> barData,
   ) {
     if (!barData.belowBarData.show) {
@@ -778,10 +778,10 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   /// then to fix the problem we use [filledBelowBarPath] to clear the above section from this draw.
   @visibleForTesting
   void drawAboveBar(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     Path aboveBarPath,
     Path filledBelowBarPath,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
     LineChartBarData<T> barData,
   ) {
     if (!barData.aboveBarData.show) {
@@ -868,11 +868,11 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
 
   @visibleForTesting
   void drawBetweenBar(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     Path barPath,
     BetweenBarsData betweenBarsData,
     Rect aroundRect,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final viewSize = canvasWrapper.size;
 
@@ -894,7 +894,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   /// draw the main bar line's shadow by the [barPath]
   @visibleForTesting
   void drawBarShadow(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     Path barPath,
     LineChartBarData<T> barData,
   ) {
@@ -930,10 +930,10 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   /// draw the main bar line by the [barPath]
   @visibleForTesting
   void drawBar(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     Path barPath,
     LineChartBarData<T> barData,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     if (!barData.show) {
       return;
@@ -967,11 +967,11 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   @visibleForTesting
   void drawTouchTooltip(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     LineTouchTooltipData<T> tooltipData,
     FlSpot<T> showOnSpot,
     ShowingTooltipIndicators<T> showingTooltipSpots,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final viewSize = canvasWrapper.size;
 
@@ -1180,7 +1180,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   double getBarLineXLength(
     LineChartBarData<T> barData,
     Size chartUsableSize,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     if (barData.spots.isEmpty) {
       return 0;
@@ -1203,7 +1203,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
   List<TouchLineBarSpot<T>>? handleTouch(
     Offset localPosition,
     Size size,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final data = holder.data;
 
@@ -1234,7 +1234,7 @@ class LineChartPainter<T> extends AxisChartPainter<LineChartData<T>> {
     Offset touchedPoint,
     LineChartBarData<T> barData,
     int barDataPosition,
-    PaintHolder<LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final data = holder.data;
     if (!barData.show) {

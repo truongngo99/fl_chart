@@ -11,18 +11,18 @@ import 'package:flutter/services.dart';
 // coverage:ignore-start
 
 /// Low level PieChart Widget.
-class PieChartLeaf extends MultiChildRenderObjectWidget {
+class PieChartLeaf<T> extends MultiChildRenderObjectWidget {
   PieChartLeaf({
     super.key,
     required this.data,
     required this.targetData,
   }) : super(children: targetData.sections.toWidgets());
 
-  final PieChartData data;
-  final PieChartData targetData;
+  final PieChartData<T> data;
+  final PieChartData<T> targetData;
 
   @override
-  RenderPieChart createRenderObject(BuildContext context) => RenderPieChart(
+  RenderPieChart<T> createRenderObject(BuildContext context) => RenderPieChart(
         context,
         data,
         targetData,
@@ -30,7 +30,7 @@ class PieChartLeaf extends MultiChildRenderObjectWidget {
       );
 
   @override
-  void updateRenderObject(BuildContext context, RenderPieChart renderObject) {
+  void updateRenderObject(BuildContext context, RenderPieChart<T> renderObject) {
     renderObject
       ..data = data
       ..targetData = targetData
@@ -41,35 +41,35 @@ class PieChartLeaf extends MultiChildRenderObjectWidget {
 // coverage:ignore-end
 
 /// Renders our PieChart, also handles hitTest.
-class RenderPieChart extends RenderBaseChart<PieTouchResponse>
+class RenderPieChart<T> extends RenderBaseChart<PieTouchResponse>
     with
         ContainerRenderObjectMixin<RenderBox, MultiChildLayoutParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, MultiChildLayoutParentData>
     implements MouseTrackerAnnotation {
   RenderPieChart(
     BuildContext context,
-    PieChartData data,
-    PieChartData targetData,
+    PieChartData<T> data,
+    PieChartData<T> targetData,
     TextScaler textScaler,
   )   : _data = data,
         _targetData = targetData,
         _textScaler = textScaler,
         super(targetData.pieTouchData, context);
 
-  PieChartData get data => _data;
-  PieChartData _data;
+  PieChartData<T> get data => _data;
+  PieChartData<T> _data;
 
-  set data(PieChartData value) {
+  set data(PieChartData<T> value) {
     if (_data == value) return;
     _data = value;
     // We must update layout to draw badges correctly!
     markNeedsLayout();
   }
 
-  PieChartData get targetData => _targetData;
-  PieChartData _targetData;
+  PieChartData<T> get targetData => _targetData;
+  PieChartData<T> _targetData;
 
-  set targetData(PieChartData value) {
+  set targetData(PieChartData<T> value) {
     if (_targetData == value) return;
     _targetData = value;
     super.updateBaseTouchData(_targetData.pieTouchData);
@@ -91,9 +91,9 @@ class RenderPieChart extends RenderBaseChart<PieTouchResponse>
   Size? mockTestSize;
 
   @visibleForTesting
-  PieChartPainter painter = PieChartPainter();
+  PieChartPainter<T> painter = PieChartPainter();
 
-  PaintHolder<PieChartData> get paintHolder =>
+  PaintHolder<T,PieChartData<T>> get paintHolder =>
       PaintHolder(data, targetData, textScaler);
 
   @override

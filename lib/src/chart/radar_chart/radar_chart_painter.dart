@@ -7,7 +7,7 @@ import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Paints [RadarChartData] in the canvas, it can be used in a [CustomPainter]
-class RadarChartPainter extends BaseChartPainter<RadarChartData> {
+class RadarChartPainter<T> extends BaseChartPainter<T,RadarChartData<T>> {
   /// Paints [dataList] into canvas, it is the animating [RadarChartData],
   /// [targetData] is the animation's target and remains the same
   /// during animation, then we should use it  when we need to show
@@ -50,8 +50,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   @override
   void paint(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<RadarChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     super.paint(context, canvasWrapper, holder);
     final data = holder.data;
@@ -73,7 +73,7 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
     return 0;
   }
 
-  double getChartCenterValue(RadarChartData data) {
+  double getChartCenterValue(RadarChartData<T> data) {
     final dataSetMaxValue = data.maxEntry.value;
     final dataSetMinValue = data.minEntry.value;
     final tickSpace = getSpaceBetweenTicks(data);
@@ -85,7 +85,7 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   }
 
   @visibleForTesting
-  double getScaledPoint(RadarEntry point, double radius, RadarChartData data) {
+  double getScaledPoint(RadarEntry point, double radius, RadarChartData<T> data) {
     final centerValue = getChartCenterValue(data);
     final distanceFromPointToCenter = point.value - centerValue;
     final distanceFromMaxToCenter = data.maxEntry.value - centerValue;
@@ -98,7 +98,7 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   }
 
   @visibleForTesting
-  double getFirstTickValue(RadarChartData data) {
+  double getFirstTickValue(RadarChartData<T> data) {
     final defaultCenterValue = getDefaultChartCenterValue();
     final dataSetMaxValue = data.maxEntry.value;
     final dataSetMinValue = data.minEntry.value;
@@ -110,7 +110,7 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   }
 
   @visibleForTesting
-  double getSpaceBetweenTicks(RadarChartData data) {
+  double getSpaceBetweenTicks(RadarChartData<T> data) {
     final defaultCenterValue = getDefaultChartCenterValue();
     final dataSetMaxValue = data.maxEntry.value;
     final dataSetMinValue = data.minEntry.value;
@@ -124,8 +124,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   @visibleForTesting
   void drawTicks(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<RadarChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     final data = holder.data;
     final size = canvasWrapper.size;
@@ -223,8 +223,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   }
 
   void drawGrids(
-    CanvasWrapper canvasWrapper,
-    PaintHolder<RadarChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     final data = holder.data;
     final size = canvasWrapper.size;
@@ -255,8 +255,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   @visibleForTesting
   void drawTitles(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<RadarChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     final data = holder.data;
     if (data.getTitle == null) return;
@@ -324,8 +324,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
 
   @visibleForTesting
   void drawDataSets(
-    CanvasWrapper canvasWrapper,
-    PaintHolder<RadarChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     final data = holder.data;
     // we will use dataSetsPosition to draw the graphs
@@ -381,7 +381,7 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   RadarTouchedSpot? handleTouch(
     Offset touchedPoint,
     Size viewSize,
-    PaintHolder<RadarChartData> holder,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     final targetData = holder.targetData;
     dataSetsPosition ??= calculateDataSetsPosition(viewSize, holder);
@@ -421,7 +421,7 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
   @visibleForTesting
   List<RadarDataSetsPosition> calculateDataSetsPosition(
     Size viewSize,
-    PaintHolder<RadarChartData> holder,
+    PaintHolder<T, RadarChartData<T>> holder,
   ) {
     final data = holder.data;
     final centerX = radarCenterX(viewSize);

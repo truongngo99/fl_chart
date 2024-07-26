@@ -8,18 +8,18 @@ import 'package:flutter/cupertino.dart';
 // coverage:ignore-start
 
 /// Low level RadarChart Widget.
-class RadarChartLeaf extends LeafRenderObjectWidget {
+class RadarChartLeaf<T> extends LeafRenderObjectWidget {
   const RadarChartLeaf({
     super.key,
     required this.data,
     required this.targetData,
   });
 
-  final RadarChartData data;
-  final RadarChartData targetData;
+  final RadarChartData<T> data;
+  final RadarChartData<T> targetData;
 
   @override
-  RenderRadarChart createRenderObject(BuildContext context) => RenderRadarChart(
+  RenderRadarChart<T> createRenderObject(BuildContext context) => RenderRadarChart(
         context,
         data,
         targetData,
@@ -27,7 +27,7 @@ class RadarChartLeaf extends LeafRenderObjectWidget {
       );
 
   @override
-  void updateRenderObject(BuildContext context, RenderRadarChart renderObject) {
+  void updateRenderObject(BuildContext context, RenderRadarChart<T> renderObject) {
     renderObject
       ..data = data
       ..targetData = targetData
@@ -38,30 +38,30 @@ class RadarChartLeaf extends LeafRenderObjectWidget {
 // coverage:ignore-end
 
 /// Renders our RadarChart, also handles hitTest.
-class RenderRadarChart extends RenderBaseChart<RadarTouchResponse> {
+class RenderRadarChart<T> extends RenderBaseChart<RadarTouchResponse> {
   RenderRadarChart(
     BuildContext context,
-    RadarChartData data,
-    RadarChartData targetData,
+    RadarChartData<T> data,
+    RadarChartData<T> targetData,
     TextScaler textScaler,
   )   : _data = data,
         _targetData = targetData,
         _textScaler = textScaler,
         super(targetData.radarTouchData, context);
 
-  RadarChartData get data => _data;
-  RadarChartData _data;
+  RadarChartData<T> get data => _data;
+  RadarChartData<T> _data;
 
-  set data(RadarChartData value) {
+  set data(RadarChartData<T> value) {
     if (_data == value) return;
     _data = value;
     markNeedsPaint();
   }
 
-  RadarChartData get targetData => _targetData;
-  RadarChartData _targetData;
+  RadarChartData<T> get targetData => _targetData;
+  RadarChartData<T> _targetData;
 
-  set targetData(RadarChartData value) {
+  set targetData(RadarChartData<T> value) {
     if (_targetData == value) return;
     _targetData = value;
     super.updateBaseTouchData(_targetData.radarTouchData);
@@ -82,9 +82,9 @@ class RenderRadarChart extends RenderBaseChart<RadarTouchResponse> {
   Size? mockTestSize;
 
   @visibleForTesting
-  RadarChartPainter painter = RadarChartPainter();
+  RadarChartPainter<T> painter = RadarChartPainter();
 
-  PaintHolder<RadarChartData> get paintHolder =>
+  PaintHolder<T,RadarChartData<T>> get paintHolder =>
       PaintHolder(data, targetData, textScaler);
 
   @override

@@ -10,7 +10,7 @@ import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Paints [PieChartData] in the canvas, it can be used in a [CustomPainter]
-class PieChartPainter extends BaseChartPainter<PieChartData> {
+class PieChartPainter<T> extends BaseChartPainter<T,PieChartData<T>> {
   /// Paints [dataList] into canvas, it is the animating [PieChartData],
   /// [targetData] is the animation's target and remains the same
   /// during animation, then we should use it  when we need to show
@@ -38,8 +38,8 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   @override
   void paint(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<PieChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, PieChartData<T>> holder,
   ) {
     super.paint(context, canvasWrapper, holder);
     final data = holder.data;
@@ -67,9 +67,9 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
 
   @visibleForTesting
   void drawCenterSpace(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     double centerRadius,
-    PaintHolder<PieChartData> holder,
+    PaintHolder<T, PieChartData> holder,
   ) {
     final data = holder.data;
     final viewSize = canvasWrapper.size;
@@ -86,10 +86,10 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
 
   @visibleForTesting
   void drawSections(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     List<double> sectionsAngle,
     double centerRadius,
-    PaintHolder<PieChartData> holder,
+    PaintHolder<T, PieChartData> holder,
   ) {
     final data = holder.data;
     final viewSize = canvasWrapper.size;
@@ -300,7 +300,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   void drawSection(
     PieChartSectionData section,
     Path sectionPath,
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
   ) {
     _sectionPaint
       ..setColorOrGradient(
@@ -316,7 +316,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   void drawSectionStroke(
     PieChartSectionData section,
     Path sectionPath,
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     Size viewSize,
   ) {
     if (section.borderSide.width != 0.0 &&
@@ -346,8 +346,8 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   @visibleForTesting
   void drawTexts(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<PieChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, PieChartData> holder,
     double centerRadius,
   ) {
     final data = holder.data;
@@ -400,7 +400,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   @visibleForTesting
   double calculateCenterRadius(
     Size viewSize,
-    PaintHolder<PieChartData> holder,
+    PaintHolder<T, PieChartData> holder,
   ) {
     final data = holder.data;
     if (data.centerSpaceRadius.isFinite) {
@@ -419,7 +419,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   PieTouchedSection handleTouch(
     Offset localPosition,
     Size viewSize,
-    PaintHolder<PieChartData> holder,
+    PaintHolder<T, PieChartData> holder,
   ) {
     final data = holder.data;
     final sectionsAngle = calculateSectionsAngle(data.sections, data.sumValue);
@@ -484,7 +484,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
   /// Exposes offset for laying out the badge widgets upon the chart.
   Map<int, Offset> getBadgeOffsets(
     Size viewSize,
-    PaintHolder<PieChartData> holder,
+    PaintHolder<T, PieChartData> holder,
   ) {
     final data = holder.data;
     final center = viewSize.center(Offset.zero);

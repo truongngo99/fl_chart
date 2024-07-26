@@ -3,7 +3,7 @@ import 'package:fl_chart/src/chart/pie_chart/pie_chart_renderer.dart';
 import 'package:flutter/material.dart';
 
 /// Renders a pie chart as a widget, using provided [PieChartData].
-class PieChart extends ImplicitlyAnimatedWidget {
+class PieChart<T> extends ImplicitlyAnimatedWidget {
   /// [data] determines how the [PieChart] should be look like,
   /// when you make any change in the [PieChartData], it updates
   /// new values with animation, and duration is [swapAnimationDuration].
@@ -23,17 +23,17 @@ class PieChart extends ImplicitlyAnimatedWidget {
   static const defaultDuration = Duration(milliseconds: 150);
 
   /// Determines how the [PieChart] should be look like.
-  final PieChartData data;
+  final PieChartData<T> data;
 
   /// Creates a [_PieChartState]
   @override
-  _PieChartState createState() => _PieChartState();
+  _PieChartState<T> createState() => _PieChartState();
 }
 
-class _PieChartState extends AnimatedWidgetBaseState<PieChart> {
+class _PieChartState<D> extends AnimatedWidgetBaseState<PieChart<D>> {
   /// We handle under the hood animations (implicit animations) via this tween,
   /// it lerps between the old [PieChartData] to the new one.
-  PieChartDataTween? _pieChartDataTween;
+  PieChartDataTween<D>? _pieChartDataTween;
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _PieChartState extends AnimatedWidgetBaseState<PieChart> {
   Widget build(BuildContext context) {
     final showingData = _getData();
 
-    return PieChartLeaf(
+    return PieChartLeaf<D>(
       data: _pieChartDataTween!.evaluate(animation),
       targetData: showingData,
     );
@@ -65,7 +65,7 @@ class _PieChartState extends AnimatedWidgetBaseState<PieChart> {
 
   /// if builtIn touches are enabled, we should recreate our [pieChartData]
   /// to handle built in touches
-  PieChartData _getData() {
+  PieChartData<D> _getData() {
     return widget.data;
   }
 
@@ -75,8 +75,8 @@ class _PieChartState extends AnimatedWidgetBaseState<PieChart> {
       _pieChartDataTween,
       widget.data,
       (dynamic value) =>
-          PieChartDataTween(begin: value as PieChartData, end: widget.data),
-    ) as PieChartDataTween?;
+          PieChartDataTween<D>(begin: value as PieChartData<D>, end: widget.data),
+    ) as PieChartDataTween<D>?;
   }
 }
 

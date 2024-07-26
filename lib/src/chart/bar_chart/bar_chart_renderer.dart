@@ -8,14 +8,14 @@ import 'package:flutter/cupertino.dart';
 // coverage:ignore-start
 
 /// Low level BarChart Widget.
-class BarChartLeaf extends LeafRenderObjectWidget {
+class BarChartLeaf<T> extends LeafRenderObjectWidget {
   const BarChartLeaf({super.key, required this.data, required this.targetData});
 
-  final BarChartData data;
-  final BarChartData targetData;
+  final BarChartData<T> data;
+  final BarChartData<T> targetData;
 
   @override
-  RenderBarChart createRenderObject(BuildContext context) => RenderBarChart(
+  RenderBarChart<T> createRenderObject(BuildContext context) => RenderBarChart(
         context,
         data,
         targetData,
@@ -23,7 +23,7 @@ class BarChartLeaf extends LeafRenderObjectWidget {
       );
 
   @override
-  void updateRenderObject(BuildContext context, RenderBarChart renderObject) {
+  void updateRenderObject(BuildContext context, RenderBarChart<T> renderObject) {
     renderObject
       ..data = data
       ..targetData = targetData
@@ -34,30 +34,30 @@ class BarChartLeaf extends LeafRenderObjectWidget {
 // coverage:ignore-end
 
 /// Renders our BarChart, also handles hitTest.
-class RenderBarChart extends RenderBaseChart<BarTouchResponse> {
+class RenderBarChart<T> extends RenderBaseChart<BarTouchResponse<T>> {
   RenderBarChart(
     BuildContext context,
-    BarChartData data,
-    BarChartData targetData,
+    BarChartData<T> data,
+    BarChartData<T> targetData,
     TextScaler textScaler,
   )   : _data = data,
         _targetData = targetData,
         _textScaler = textScaler,
         super(targetData.barTouchData, context);
 
-  BarChartData get data => _data;
-  BarChartData _data;
+  BarChartData<T> get data => _data;
+  BarChartData<T> _data;
 
-  set data(BarChartData value) {
+  set data(BarChartData<T> value) {
     if (_data == value) return;
     _data = value;
     markNeedsPaint();
   }
 
-  BarChartData get targetData => _targetData;
-  BarChartData _targetData;
+  BarChartData<T> get targetData => _targetData;
+  BarChartData<T> _targetData;
 
-  set targetData(BarChartData value) {
+  set targetData(BarChartData<T> value) {
     if (_targetData == value) return;
     _targetData = value;
     super.updateBaseTouchData(_targetData.barTouchData);
@@ -78,9 +78,9 @@ class RenderBarChart extends RenderBaseChart<BarTouchResponse> {
   Size? mockTestSize;
 
   @visibleForTesting
-  BarChartPainter painter = BarChartPainter();
+  BarChartPainter<T> painter = BarChartPainter();
 
-  PaintHolder<BarChartData> get paintHolder =>
+  PaintHolder<T,BarChartData<T>> get paintHolder =>
       PaintHolder(data, targetData, textScaler);
 
   @override
@@ -97,7 +97,7 @@ class RenderBarChart extends RenderBaseChart<BarTouchResponse> {
   }
 
   @override
-  BarTouchResponse getResponseAtLocation(Offset localPosition) {
+  BarTouchResponse<T> getResponseAtLocation(Offset localPosition) {
     final touchedSpot = painter.handleTouch(
       localPosition,
       mockTestSize ?? size,

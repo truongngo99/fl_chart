@@ -13,7 +13,7 @@ import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Paints [BarChartData] in the canvas, it can be used in a [CustomPainter]
-class BarChartPainter extends AxisChartPainter<BarChartData> {
+class BarChartPainter<T> extends AxisChartPainter<T,BarChartData<T>> {
   /// Paints [dataList] into canvas, it is the animating [BarChartData],
   /// [targetData] is the animation's target and remains the same
   /// during animation, then we should use it  when we need to show
@@ -46,8 +46,8 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
   @override
   void paint(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
-    PaintHolder<BarChartData> holder,
+    CanvasWrapper<T> canvasWrapper,
+    PaintHolder<T, BarChartData<T>> holder,
   ) {
     super.paint(context, canvasWrapper, holder);
     final data = holder.data;
@@ -146,9 +146,9 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
 
   @visibleForTesting
   void drawBars(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     List<GroupBarsPosition> groupBarsPosition,
-    PaintHolder<BarChartData> holder,
+    PaintHolder<T, BarChartData<T>> holder,
   ) {
     final data = holder.data;
     final viewSize = canvasWrapper.size;
@@ -333,14 +333,14 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
   @visibleForTesting
   void drawTouchTooltip(
     BuildContext context,
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     List<GroupBarsPosition> groupPositions,
     BarTouchTooltipData tooltipData,
     BarChartGroupData showOnBarGroup,
     int barGroupIndex,
     BarChartRodData showOnRodData,
     int barRodIndex,
-    PaintHolder<BarChartData> holder,
+    PaintHolder<T, BarChartData<T>> holder,
   ) {
     final viewSize = canvasWrapper.size;
 
@@ -517,14 +517,14 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
 
   @visibleForTesting
   void drawStackItemBorderStroke(
-    CanvasWrapper canvasWrapper,
+    CanvasWrapper<T> canvasWrapper,
     BarChartRodStackItem stackItem,
     int index,
     int rodStacksSize,
     double barThickSize,
     RRect barRRect,
     Size drawSize,
-    PaintHolder<BarChartData> holder,
+    PaintHolder<T, BarChartData<T>> holder,
   ) {
     if (stackItem.borderSide.width == 0 ||
         stackItem.borderSide.color.opacity == 0) return;
@@ -581,10 +581,10 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
   /// then makes a [BarTouchedSpot] from the elements that has been touched.
   ///
   /// Returns null if finds nothing!
-  BarTouchedSpot? handleTouch(
+  BarTouchedSpot<T>? handleTouch(
     Offset localPosition,
     Size viewSize,
-    PaintHolder<BarChartData> holder,
+    PaintHolder<T, BarChartData<T>> holder,
   ) {
     final data = holder.data;
     final targetData = holder.targetData;
@@ -679,7 +679,7 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
           final nearestGroup = targetData.barGroups[i];
           final nearestBarRod = nearestGroup.barRods[j];
           final nearestSpot =
-              FlSpot(nearestGroup.x.toDouble(), nearestBarRod.toY);
+              FlSpot<T>(nearestGroup.x.toDouble(), nearestBarRod.toY);
           final nearestSpotPos =
               Offset(barX, getPixelY(nearestSpot.y, viewSize, holder));
 

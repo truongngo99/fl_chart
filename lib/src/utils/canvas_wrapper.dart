@@ -11,7 +11,7 @@ typedef DrawCallback = void Function();
 ///
 /// We wrapped the canvas here, because we needed to write tests for our drawing system.
 /// Now in tests we can verify that these functions called with a specific value.
-class CanvasWrapper {
+class CanvasWrapper<T> {
   CanvasWrapper(
     this.canvas,
     this.size,
@@ -114,7 +114,7 @@ class CanvasWrapper {
   ///
   /// Paints a customized dot using [FlDotPainter] at the [spot]'s position,
   /// with the [offset]
-  void drawDot(FlDotPainter painter, FlSpot spot, Offset offset) {
+  void drawDot<T>(FlDotPainter<T> painter, FlSpot<T> spot, Offset offset) {
     painter.draw(canvas, spot, offset);
   }
 
