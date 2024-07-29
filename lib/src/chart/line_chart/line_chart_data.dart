@@ -891,11 +891,11 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
 
   /// The starting point on y axis of the touch line. By default, line starts on the bottom of
   /// the chart.
-  final GetTouchLineY getTouchLineStart;
+  final GetTouchLineY<T> getTouchLineStart;
 
   /// The end point on y axis of the touch line. By default, line ends at the touched point.
   /// If line end is overlap with the dot, it will be automatically adjusted to the edge of the dot.
-  final GetTouchLineY getTouchLineEnd;
+  final GetTouchLineY<T> getTouchLineEnd;
 
   /// Copies current [LineTouchData] to a new [LineTouchData],
   /// and replaces provided values.
@@ -908,8 +908,8 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
     GetTouchedSpotIndicator<T>? getTouchedSpotIndicator,
     double? touchSpotThreshold,
     CalculateTouchDistance? distanceCalculator,
-    GetTouchLineY? getTouchLineStart,
-    GetTouchLineY? getTouchLineEnd,
+    GetTouchLineY<T>? getTouchLineStart,
+    GetTouchLineY<T>? getTouchLineEnd,
     bool? handleBuiltInTouches,
   }) {
     return LineTouchData(
@@ -956,7 +956,7 @@ typedef GetTouchedSpotIndicator<T> = List<TouchedSpotIndicatorData<T>?> Function
 );
 
 /// Used for determine the touch indicator line's starting/end point.
-typedef GetTouchLineY = double Function<T>(
+typedef GetTouchLineY<T> = double Function(
   LineChartBarData<T> barData,
   int spotIndex,
 );
@@ -1001,12 +1001,12 @@ List<TouchedSpotIndicatorData<T>> defaultTouchedIndicators<T>(
 }
 
 /// By default line starts from the bottom of the chart.
-double defaultGetTouchLineStart<T>(LineChartBarData<T> barData, int spotIndex) {
+double defaultGetTouchLineStart(LineChartBarData barData, int spotIndex) {
   return -double.infinity;
 }
 
 /// By default line ends at the touched point.
-double defaultGetTouchLineEnd<T>(LineChartBarData<T> barData, int spotIndex) {
+double defaultGetTouchLineEnd(LineChartBarData barData, int spotIndex) {
   return barData.spots[spotIndex].y;
 }
 
