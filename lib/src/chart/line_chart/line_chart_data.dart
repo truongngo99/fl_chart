@@ -73,6 +73,7 @@ class LineChartData<T> extends AxisChartData<T> with EquatableMixin {
   final List<BetweenBarsData> betweenBarsData;
 
   /// Handles touch behaviors and responses.
+  /// Default is [LineTouchData<T>()]
   final LineTouchData<T> lineTouchData;
 
   /// You can show some tooltipIndicators (a popup with an information)
@@ -342,6 +343,7 @@ class LineChartBarData<T> with EquatableMixin {
   final BarAreaData<T> aboveBarData;
 
   /// Responsible to showing [spots] on the line as a circular point.
+  /// Default is [FlDotData<T>()]
   final FlDotData<T> dotData;
 
   /// Show indicators based on provided indexes
@@ -754,10 +756,12 @@ class FlDotData<T> with EquatableMixin {
   final bool show;
 
   /// Checks to show or hide an individual dot.
+  /// Default is showAllDots
   final CheckToShowDot<T> checkToShowDot;
 
   /// Callback which is called to set the painter of the given [FlSpot].
   /// The [FlSpot] is provided as parameter to this callback
+  /// Default is _defaultGetDotPainter
   final GetDotPainterCallback<T> getDotPainter;
 
   /// Lerps a [FlDotData] based on [t] value, check [Tween.lerp].
@@ -788,6 +792,7 @@ typedef CheckToShowDot<T> = bool Function(FlSpot<T> spot, LineChartBarData<T> ba
 bool showAllDots<T>(FlSpot<T> spot, LineChartBarData<T> barData) {
   return true;
 }
+
 enum LabelDirection { horizontal, vertical }
 
 /// Shows a text label
@@ -854,7 +859,7 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
   /// You can customize this tooltip using [touchTooltipData], indicator lines starts from position
   /// controlled by [getTouchLineStart] and ends at position controlled by [getTouchLineEnd].
   /// If you need to have a distance threshold for handling touches, use [touchSpotThreshold].
-   LineTouchData({
+  LineTouchData({
     bool enabled = true,
     BaseTouchCallback<LineTouchResponse<T>>? touchCallback,
     MouseCursorResolver<LineTouchResponse<T>>? mouseCursorResolver,
@@ -874,9 +879,11 @@ class LineTouchData<T> extends FlTouchData<LineTouchResponse<T>> with EquatableM
         );
 
   /// Configs of how touch tooltip popup.
+  /// Default is [LineTouchTooltipData]
   final LineTouchTooltipData<T> touchTooltipData;
 
   /// Configs of how touch indicator looks like.
+  /// Default is [defaultTouchedIndicators]
   final GetTouchedSpotIndicator<T> getTouchedSpotIndicator;
 
   /// Distance threshold to handle the touch event.
@@ -1025,7 +1032,7 @@ class LineTouchTooltipData<T> with EquatableMixin {
   /// Sometimes, [LineChart] shows the tooltip outside of the chart,
   /// you can set [fitInsideHorizontally] true to force it to shift inside the chart horizontally,
   /// also you can set [fitInsideVertically] true to force it to shift inside the chart vertically.
-   const LineTouchTooltipData({
+  const LineTouchTooltipData({
     this.tooltipRoundedRadius = 4,
     this.tooltipPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     this.tooltipMargin = 16,
@@ -1040,7 +1047,6 @@ class LineTouchTooltipData<T> with EquatableMixin {
     this.rotateAngle = 0.0,
     this.tooltipBorder = BorderSide.none,
   });
-
 
   /// Sets a rounded radius for the tooltip.
   final double tooltipRoundedRadius;
@@ -1061,6 +1067,7 @@ class LineTouchTooltipData<T> with EquatableMixin {
   final double maxContentWidth;
 
   /// Retrieves data for showing content inside the tooltip.
+  /// Default is [defaultLineTooltipItem]
   final GetLineTooltipItems<T> getTooltipItems;
 
   /// Forces the tooltip to shift horizontally inside the chart, if overflow happens.
@@ -1111,8 +1118,6 @@ typedef GetLineTooltipItems<T> = List<LineTooltipItem<T>?> Function(
   List<LineBarSpot<T>> touchedSpots,
 );
 
-
-
 /// Default implementation for [LineTouchTooltipData.getTooltipItems].
 List<LineTooltipItem<T>?> defaultLineTooltipItem<T>(List<LineBarSpot<T>> touchedSpots) {
   return touchedSpots.map((LineBarSpot<T> touchedSpot) {
@@ -1121,7 +1126,13 @@ List<LineTooltipItem<T>?> defaultLineTooltipItem<T>(List<LineBarSpot<T>> touched
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    return LineTooltipItem<T>(touchedSpot.y.toString(), textStyle);
+    return LineTooltipItem<T>(touchedSpot.y.toString(),
+        customDataChart: touchedSpot.data,
+        textStyleHour: textStyle,
+        textStyleDate: textStyle,
+        textStyleName: textStyle,
+        textStyleValue: textStyle,
+        value: '');
   }).toList();
 }
 
@@ -1151,7 +1162,7 @@ class LineBarSpot<T> extends FlSpot<T> with EquatableMixin {
     this.barIndex,
     FlSpot<T> spot,
   )   : spotIndex = bar.spots.indexOf(spot),
-        super(spot.x, spot.y);
+        super(spot.x, spot.y, spot.data);
 
   /// Is the [LineChartBarData] that this spot is inside of.
   final LineChartBarData<T> bar;
@@ -1191,18 +1202,33 @@ class LineTooltipItem<T> with EquatableMixin {
   /// Shows a [text] with [textStyle], [textDirection],
   /// and optional [children] as a row in the tooltip popup.
   const LineTooltipItem(
-    this.text,
-    this.textStyle, {
+    this.text, {
     this.textAlign = TextAlign.center,
     this.textDirection = TextDirection.ltr,
     this.children,
+    this.isBoolChart = false,
+    required this.value,
+    required this.customDataChart,
+    required this.textStyleHour,
+    required this.textStyleDate,
+    required this.textStyleName,
+    required this.textStyleValue,
   });
 
   /// Showing text.
   final String text;
 
-  /// Style of showing text.
-  final TextStyle textStyle;
+  /// Style of showing text hour.
+  final TextStyle textStyleHour;
+
+  /// Style of showing text date.
+  final TextStyle textStyleDate;
+
+  /// Style of showing text name.
+  final TextStyle textStyleName;
+
+  /// Style of showing text value.
+  final TextStyle textStyleValue;
 
   /// Align of showing text.
   final TextAlign textAlign;
@@ -1213,14 +1239,25 @@ class LineTooltipItem<T> with EquatableMixin {
   /// List<TextSpan> add further style and format to the text of the tooltip
   final List<TextSpan>? children;
 
+  /// Data custom [ChartModel]
+  final T customDataChart;
+
+  final bool isBoolChart;
+
+  final String value;
+
   /// Used for equality check, see [EquatableMixin].
   @override
   List<Object?> get props => [
         text,
-        textStyle,
+        textStyleHour,
+        textStyleDate,
+        textStyleName,
+        textStyleValue,
         textAlign,
         textDirection,
         children,
+        customDataChart,
       ];
 }
 

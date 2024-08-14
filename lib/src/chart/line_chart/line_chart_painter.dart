@@ -8,11 +8,12 @@ import 'package:fl_chart/src/extensions/paint_extension.dart';
 import 'package:fl_chart/src/extensions/path_extension.dart';
 import 'package:fl_chart/src/extensions/text_align_extension.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
+import 'package:fl_chart/src/utils/date_time_util.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Paints [LineChartData] in the canvas, it can be used in a [CustomPainter]
-class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
+class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
   /// Paints [dataList] into canvas, it is the animating [LineChartData],
   /// [targetData] is the animation's target and remains the same
   /// during animation, then we should use it  when we need to show
@@ -46,6 +47,7 @@ class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
       ..color = Colors.transparent
       ..strokeWidth = 1.0;
   }
+
   late Paint _barPaint;
   late Paint _barAreaPaint;
   late Paint _barAreaLinesPaint;
@@ -59,7 +61,7 @@ class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
   void paint(
     BuildContext context,
     CanvasWrapper<T> canvasWrapper,
-    PaintHolder<T,LineChartData<T>> holder,
+    PaintHolder<T, LineChartData<T>> holder,
   ) {
     final data = holder.data;
     if (data.lineBarsData.isEmpty) {
@@ -990,21 +992,57 @@ class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
       if (tooltipItem == null) {
         continue;
       }
+      if (tooltipItem.customDataChart is LightHouseTooltip) {
+        print("TooltiopITem");
+        final data = tooltipItem.customDataChart as LightHouseTooltip;
+        final timeChart = DateTimeUtil.convertMillisecondToDateTime(data.timestamp.toInt());
+        final timeSpan = TextSpan(
+          text: DateTimeUtil.formatHm(timeChart),
+          style: tooltipItem.textStyleHour,
+          children: tooltipItem.children,
+        );
+        final monthYearDaySpan = TextSpan(
+          style: tooltipItem.textStyleDate,
+          text: DateTimeUtil.formatyMd(timeChart),
+          children: tooltipItem.children,
+        );
 
-      final span = TextSpan(
-        style: Utils().getThemeAwareTextStyle(context, tooltipItem.textStyle),
-        text: tooltipItem.text,
-        children: tooltipItem.children,
-      );
+        final nameSpan = TextSpan(
+          style: tooltipItem.textStyleName,
+          text: data.nameMetric,
+          children: tooltipItem.children,
+        );
 
-      final tp = TextPainter(
-        text: span,
-        textAlign: tooltipItem.textAlign,
-        textDirection: tooltipItem.textDirection,
-        textScaler: holder.textScaler,
-      )..layout(maxWidth: tooltipData.maxContentWidth);
-      drawingTextPainters.add(tp);
+        final valueSpan = TextSpan(
+          style: tooltipItem.textStyleValue,
+          text: data.value.toString(),
+          children: tooltipItem.children,
+        );
+
+        final line1_1 = TextPainter(
+          text: timeSpan,
+          textDirection: tooltipItem.textDirection,
+          textScaler: holder.textScaler,
+        )..layout(maxWidth: 158 / 2);
+        final line1_2 = TextPainter(
+          text: monthYearDaySpan,
+          textAlign: TextAlign.end,
+          textDirection: tooltipItem.textDirection,
+          textScaler: holder.textScaler,
+        )..layout(maxWidth: 158 / 2);
+        final tp1 = TextPainter(
+          text: TextSpan(children: [nameSpan, valueSpan]),
+          textAlign: TextAlign.justify,
+          textDirection: tooltipItem.textDirection,
+          textScaler: holder.textScaler,
+        )..layout(maxWidth: tooltipData.maxContentWidth);
+        drawingTextPainters
+          ..add(line1_1)
+          ..add(line1_2)
+          ..add(tp1);
+      }
     }
+
     if (drawingTextPainters.isEmpty) {
       return;
     }
@@ -1132,6 +1170,7 @@ class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
         ..color = tooltipData.tooltipBorder.color
         ..strokeWidth = tooltipData.tooltipBorder.width;
     }
+    // final pathTooltip = ShapeTooltip.createTooltip(rect.size);
 
     canvasWrapper.drawRotated(
       size: rect.size,
@@ -1139,9 +1178,8 @@ class LineChartPainter<T> extends AxisChartPainter<T,LineChartData<T>> {
       drawOffset: rectDrawOffset,
       angle: rotateAngle,
       drawCallback: () {
-        canvasWrapper
-          ..drawRRect(roundedRect, _bgTouchTooltipPaint)
-          ..drawRRect(roundedRect, _borderTouchTooltipPaint);
+        canvasWrapper.drawRRect(roundedRect, _bgTouchTooltipPaint);
+        // ..drawRRect(roundedRect, _borderTouchTooltipPaint);
       },
     );
 
@@ -1294,4 +1332,46 @@ class LineIndexDrawingInfo<T> {
   final FlSpot<T> spot;
   final int spotIndex;
   final TouchedSpotIndicatorData<T> indicatorData;
+}
+
+class ShapeTooltip {
+  static Path createTooltip(Size size) {
+    final path = Path()
+      ..moveTo(size.width * 0.1288660, size.height * 0.03061224)
+      ..cubicTo(
+        size.width * 0.08331649,
+        size.height * 0.03061224,
+        size.width * 0.04639175,
+        size.height * 0.1037082,
+        size.width * 0.04639175,
+        size.height * 0.1938776,
+      )
+      ..lineTo(size.width * 0.04639175, size.height * 0.6020408)
+      ..cubicTo(
+        size.width * 0.04639175,
+        size.height * 0.6922102,
+        size.width * 0.08331649,
+        size.height * 0.7653061,
+        size.width * 0.1288660,
+        size.height * 0.7653061,
+      )
+      ..lineTo(size.width * 0.4633448, size.height * 0.7653061)
+      ..lineTo(size.width * 0.5022907, size.height * 0.8469388)
+      ..lineTo(size.width * 0.5412371, size.height * 0.7653061)
+      ..lineTo(size.width * 0.8711340, size.height * 0.7653061)
+      ..cubicTo(size.width * 0.9166856, size.height * 0.7653061, size.width * 0.9536082, size.height * 0.6922102, size.width * 0.9536082,
+          size.height * 0.6020408)
+      ..lineTo(size.width * 0.9536082, size.height * 0.1938776)
+      ..cubicTo(
+        size.width * 0.9536082,
+        size.height * 0.1037082,
+        size.width * 0.9166856,
+        size.height * 0.03061224,
+        size.width * 0.8711340,
+        size.height * 0.03061224,
+      )
+      ..lineTo(size.width * 0.1288660, size.height * 0.03061224)
+      ..close();
+    return path;
+  }
 }

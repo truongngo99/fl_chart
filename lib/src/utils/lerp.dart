@@ -108,60 +108,7 @@ List<BetweenBarsData>? lerpBetweenBarsDataList(
     lerpList(a, b, t, lerp: BetweenBarsData.lerp);
 
 /// Lerps [BarChartGroupData] list based on [t] value, check [Tween.lerp].
-List<BarChartGroupData>? lerpBarChartGroupDataList(
-  List<BarChartGroupData>? a,
-  List<BarChartGroupData>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: BarChartGroupData.lerp);
 
-/// Lerps [BarChartRodData] list based on [t] value, check [Tween.lerp].
-List<BarChartRodData>? lerpBarChartRodDataList(
-  List<BarChartRodData>? a,
-  List<BarChartRodData>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: BarChartRodData.lerp);
-
-/// Lerps [PieChartSectionData] list based on [t] value, check [Tween.lerp].
-List<PieChartSectionData>? lerpPieChartSectionDataList(
-  List<PieChartSectionData>? a,
-  List<PieChartSectionData>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: PieChartSectionData.lerp);
-
-/// Lerps [ScatterSpot] list based on [t] value, check [Tween.lerp].
-// List<ScatterSpot>? lerpScatterSpotList(
-//   List<ScatterSpot>? a,
-//   List<ScatterSpot>? b,
-//   double t,
-// ) =>
-//     lerpList(a, b, t, lerp: ScatterSpot.lerp);
-
-/// Lerps [BarChartRodStackItem] list based on [t] value, check [Tween.lerp].
-List<BarChartRodStackItem>? lerpBarChartRodStackList(
-  List<BarChartRodStackItem>? a,
-  List<BarChartRodStackItem>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: BarChartRodStackItem.lerp);
-
-/// Lerps [RadarDataSet] list based on [t] value, check [Tween.lerp].
-List<RadarDataSet>? lerpRadarDataSetList(
-  List<RadarDataSet>? a,
-  List<RadarDataSet>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: RadarDataSet.lerp);
-
-/// Lerps [RadarEntry] list based on [t] value, check [Tween.lerp].
-List<RadarEntry>? lerpRadarEntryList(
-  List<RadarEntry>? a,
-  List<RadarEntry>? b,
-  double t,
-) =>
-    lerpList(a, b, t, lerp: RadarEntry.lerp);
 
 /// Lerps between a [LinearGradient] colors, based on [t]
 Color lerpGradient(List<Color> colors, List<double> stops, double t) {

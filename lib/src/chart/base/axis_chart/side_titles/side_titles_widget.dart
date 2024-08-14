@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_helper.dart';
 import 'package:fl_chart/src/chart/base/axis_chart/side_titles/side_titles_flex.dart';
-import 'package:fl_chart/src/extensions/bar_chart_data_extension.dart';
 import 'package:fl_chart/src/extensions/edge_insets_extension.dart';
 import 'package:fl_chart/src/extensions/fl_border_data_extension.dart';
 import 'package:fl_chart/src/extensions/fl_titles_data_extension.dart';
@@ -117,38 +116,25 @@ class SideTitlesWidget extends StatelessWidget {
           axisViewSize,
           axisMax - axisMin,
         );
-    if (isHorizontal && axisChartData is BarChartData) {
-      final barChartData = axisChartData as BarChartData;
-      if (barChartData.barGroups.isEmpty) {
-        return [];
+
+    final axisValues = AxisChartHelper().iterateThroughAxis(
+      min: axisMin,
+      max: axisMax,
+      baseLine: axisBaseLine,
+      interval: interval,
+    );
+    axisPositions = axisValues.map((axisValue) {
+      final axisDiff = axisMax - axisMin;
+      var portion = 0.0;
+      if (axisDiff > 0) {
+        portion = (axisValue - axisMin) / axisDiff;
       }
-      final xLocations = barChartData.calculateGroupsX(axisViewSize);
-      axisPositions = xLocations.asMap().entries.map((e) {
-        final index = e.key;
-        final xLocation = e.value;
-        final xValue = barChartData.barGroups[index].x;
-        return AxisSideTitleMetaData(xValue.toDouble(), xLocation);
-      }).toList();
-    } else {
-      final axisValues = AxisChartHelper().iterateThroughAxis(
-        min: axisMin,
-        max: axisMax,
-        baseLine: axisBaseLine,
-        interval: interval,
-      );
-      axisPositions = axisValues.map((axisValue) {
-        final axisDiff = axisMax - axisMin;
-        var portion = 0.0;
-        if (axisDiff > 0) {
-          portion = (axisValue - axisMin) / axisDiff;
-        }
-        if (isVertical) {
-          portion = 1 - portion;
-        }
-        final axisLocation = portion * axisViewSize;
-        return AxisSideTitleMetaData(axisValue, axisLocation);
-      }).toList();
-    }
+      if (isVertical) {
+        portion = 1 - portion;
+      }
+      final axisLocation = portion * axisViewSize;
+      return AxisSideTitleMetaData(axisValue, axisLocation);
+    }).toList();
     return axisPositions.map(
       (metaData) {
         return AxisSideTitleWidgetHolder(

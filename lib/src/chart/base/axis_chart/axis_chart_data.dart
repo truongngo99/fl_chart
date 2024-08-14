@@ -439,40 +439,40 @@ class FlTitlesData with EquatableMixin {
 
 /// Represents a conceptual position in cartesian (axis based) space.
 @immutable
-class FlSpot<T> {
+class FlSpot<LightHouseTooltip> {
   /// [x] determines cartesian (axis based) horizontally position
   /// 0 means most left point of the chart
   ///
   /// [y] determines cartesian (axis based) vertically position
   /// 0 means most bottom point of the chart
-  const FlSpot(this.x, this.y, {this.data});
+  const FlSpot(this.x, this.y, this.data);
   final double x;
   final double y;
-  final T? data;
+  final LightHouseTooltip data;
 
   /// Copies current [FlSpot] to a new [FlSpot],
   /// and replaces provided values.
-  FlSpot<T> copyWith({
+  FlSpot<LightHouseTooltip> copyWith({
     double? x,
     double? y,
-    T? data,
+    LightHouseTooltip? data,
   }) {
-    return FlSpot<T>(
+    return FlSpot<LightHouseTooltip>(
       x ?? this.x,
       y ?? this.y,
-      data: data ?? this.data,
+       data ?? this.data,
     );
   }
 
   ///Prints x and y coordinates of FlSpot list
   @override
-  String toString() => '($x, $y)';
+  String toString() => '($x, $y, $data)';
 
   /// Used for splitting lines, or maybe other concepts.
-  static const FlSpot<num> nullSpot = FlSpot<num>(double.nan, double.nan);
+  static const FlSpot<num> nullSpot = FlSpot<num>(double.nan, double.nan, double.nan);
 
   /// Sets zero for x and y
-  static const FlSpot<num> zero = FlSpot<num>(0, 0);
+  static const FlSpot<num> zero = FlSpot<num>(0, 0,0);
 
   /// Determines if [x] or [y] is null.
   bool isNull() => this == nullSpot;
@@ -481,7 +481,7 @@ class FlSpot<T> {
   bool isNotNull() => !isNull();
 
   /// Lerps a [FlSpot] based on [t] value, check [Tween.lerp].
-  static FlSpot<T> lerp<T>(FlSpot<T> a, FlSpot<T> b, double t) {
+  static FlSpot<int> lerp<int>(FlSpot<int> a, FlSpot<int> b,  double t) {
     if (a == FlSpot.nullSpot) {
       return b;
     }
@@ -490,9 +490,11 @@ class FlSpot<T> {
       return a;
     }
 
+
     return FlSpot(
       lerpDouble(a.x, b.x, t)!,
       lerpDouble(a.y, b.y, t)!,
+      1 as int,
     );
   }
 
