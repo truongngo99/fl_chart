@@ -439,7 +439,7 @@ class FlTitlesData with EquatableMixin {
 
 /// Represents a conceptual position in cartesian (axis based) space.
 @immutable
-class FlSpot<LightHouseTooltip> {
+class FlSpot<T> {
   /// [x] determines cartesian (axis based) horizontally position
   /// 0 means most left point of the chart
   ///
@@ -448,19 +448,19 @@ class FlSpot<LightHouseTooltip> {
   const FlSpot(this.x, this.y, this.data);
   final double x;
   final double y;
-  final LightHouseTooltip data;
+  final T data;
 
   /// Copies current [FlSpot] to a new [FlSpot],
   /// and replaces provided values.
-  FlSpot<LightHouseTooltip> copyWith({
+  FlSpot<T> copyWith({
     double? x,
     double? y,
-    LightHouseTooltip? data,
+    T? data,
   }) {
-    return FlSpot<LightHouseTooltip>(
+    return FlSpot<T>(
       x ?? this.x,
       y ?? this.y,
-       data ?? this.data,
+      data ?? this.data,
     );
   }
 
@@ -469,10 +469,10 @@ class FlSpot<LightHouseTooltip> {
   String toString() => '($x, $y, $data)';
 
   /// Used for splitting lines, or maybe other concepts.
-  static const FlSpot<num> nullSpot = FlSpot<num>(double.nan, double.nan, double.nan);
+  static  FlSpot<LightHouseTooltip> nullSpot = FlSpot<LightHouseTooltip>(double.nan, double.nan, LightHouseTooltip());
 
   /// Sets zero for x and y
-  static const FlSpot<num> zero = FlSpot<num>(0, 0,0);
+  static  FlSpot<LightHouseTooltip> zero = FlSpot<LightHouseTooltip>(0, 0,LightHouseTooltip());
 
   /// Determines if [x] or [y] is null.
   bool isNull() => this == nullSpot;
@@ -497,6 +497,7 @@ class FlSpot<LightHouseTooltip> {
       1 as int,
     );
   }
+
 
   /// Two [FlSpot] are equal if their [x] and [y] are equal.
   @override

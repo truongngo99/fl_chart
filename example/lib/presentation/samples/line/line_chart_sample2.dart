@@ -28,43 +28,28 @@ class _LineChartSample2State extends State<LineChartSample2> {
     List.generate(20, (index) {
       final yRand = Random().nextDouble() * 10;
       spotData.add(FlSpot(
-          index.toDouble(), yRand, LightHouseTooltip(timestamp: 123456708, value: 353, nameMetric: "nameMetric", color: Colors.red)));
+          index.toDouble(), yRand, LightHouseTooltip(timestamp: 123456708, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1)));
     });
     super.initState();
   }
 
-  FlSpot<LightHouseTooltip> findNearestSpot(List<FlSpot<LightHouseTooltip>> data, double x) {
-    double minDistance = double.infinity;
-    FlSpot<LightHouseTooltip> nearestSpot = data.first;
-    for (FlSpot<LightHouseTooltip> spot in data) {
-      double distance = (spot.x - x).abs();
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestSpot = spot;
-      }
-    }
-    return nearestSpot;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.only(
-          right: 18,
-          left: 12,
-          top: 24,
-          bottom: 50,
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: LineChart<LightHouseTooltip>(
-                avgData(),
-              ),
+    return Padding(
+      padding: const EdgeInsets.only(
+        right: 18,
+        left: 12,
+        top: 24,
+        bottom: 50,
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: LineChart<LightHouseTooltip>(
+              avgData(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -92,16 +77,20 @@ class _LineChartSample2State extends State<LineChartSample2> {
       lineTouchData: LineTouchData(
         longPressDuration: const Duration(milliseconds: 50),
         touchTooltipData: LineTouchTooltipData(
-          tooltipPadding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+          tooltipRoundedRadius: 16,
+          tooltipPadding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           tooltipMargin: 0,
+          shadowColor: Random().nextBool() ? Colors.grey.withOpacity(0.5) : const Color.fromARGB(0, 15, 14, 14),
           getTooltipColor: (touchedSpot) => const Color(0xFF3b3f4b),
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((e) {
               return LineTooltipItem(
                 e.y.toString(),
+                isBoolChart: true,
                 value: "truiong",
+                // isShowName: true,
                 customDataChart: e.data,
-                textStyleDate: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w700),
+                textStyleDate: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w700),
                 textStyleHour: const TextStyle(
                   fontSize: 16,
                   height: 1.25,
@@ -254,3 +243,10 @@ class _LineChartSample2State extends State<LineChartSample2> {
     ];
   }
 }
+
+
+final spotData = <FlSpot<LightHouseTooltip>>[
+  FlSpot(1723605896, 15, LightHouseTooltip(timestamp: 1723605896000, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1),),
+  FlSpot(1723606196, 15, LightHouseTooltip(timestamp: 1723606196000, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1),),
+  FlSpot(1723606496, 15, LightHouseTooltip(timestamp: 1723606496000, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1),),
+];

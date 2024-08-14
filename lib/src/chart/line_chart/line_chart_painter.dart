@@ -993,7 +993,6 @@ class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
         continue;
       }
       if (tooltipItem.customDataChart is LightHouseTooltip) {
-        print("TooltiopITem");
         final data = tooltipItem.customDataChart as LightHouseTooltip;
         final timeChart = DateTimeUtil.convertMillisecondToDateTime(data.timestamp.toInt());
         final timeSpan = TextSpan(
@@ -1006,6 +1005,7 @@ class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
           text: DateTimeUtil.formatyMd(timeChart),
           children: tooltipItem.children,
         );
+        const spaceWidthSpan = TextSpan(text: '   ');
 
         final nameSpan = TextSpan(
           style: tooltipItem.textStyleName,
@@ -1015,31 +1015,40 @@ class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
 
         final valueSpan = TextSpan(
           style: tooltipItem.textStyleValue,
-          text: data.value.toString(),
+          text: tooltipItem.value.toString(),
           children: tooltipItem.children,
         );
-
+        final line1 = TextSpan(
+          children: [timeSpan,spaceWidthSpan, monthYearDaySpan],
+        );
         final line1_1 = TextPainter(
-          text: timeSpan,
+          text: line1,
           textDirection: tooltipItem.textDirection,
           textScaler: holder.textScaler,
-        )..layout(maxWidth: 158 / 2);
-        final line1_2 = TextPainter(
-          text: monthYearDaySpan,
-          textAlign: TextAlign.end,
-          textDirection: tooltipItem.textDirection,
-          textScaler: holder.textScaler,
-        )..layout(maxWidth: 158 / 2);
+        )..layout(maxWidth: 158 );
+
+
         final tp1 = TextPainter(
-          text: TextSpan(children: [nameSpan, valueSpan]),
-          textAlign: TextAlign.justify,
+          text: valueSpan,
           textDirection: tooltipItem.textDirection,
           textScaler: holder.textScaler,
         )..layout(maxWidth: tooltipData.maxContentWidth);
-        drawingTextPainters
-          ..add(line1_1)
-          ..add(line1_2)
-          ..add(tp1);
+        if (tooltipItem.isShowName) {
+          final nameTp = TextPainter(
+            text: nameSpan,
+            textDirection: tooltipItem.textDirection,
+            textScaler: holder.textScaler,
+          )..layout(maxWidth: tooltipData.maxContentWidth);
+          drawingTextPainters
+            ..add(line1_1)
+            ..add(nameTp)
+            ..add(tp1);
+        } else {
+          drawingTextPainters
+            ..add(line1_1)
+            ..add(tp1);
+        }
+
       }
     }
 
@@ -1170,16 +1179,18 @@ class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
         ..color = tooltipData.tooltipBorder.color
         ..strokeWidth = tooltipData.tooltipBorder.width;
     }
-    // final pathTooltip = ShapeTooltip.createTooltip(rect.size);
-
+    final pathTooltip = ShapeTooltip.createTooltip(Size(tooltipWidth, tooltipHeight));
+    final pathTooltip1 = ShapeTooltip.createTooltip(Size(tooltipWidth, tooltipHeight + 4));
     canvasWrapper.drawRotated(
       size: rect.size,
       rotationOffset: rectRotationOffset,
       drawOffset: rectDrawOffset,
       angle: rotateAngle,
       drawCallback: () {
-        canvasWrapper.drawRRect(roundedRect, _bgTouchTooltipPaint);
-        // ..drawRRect(roundedRect, _borderTouchTooltipPaint);
+        canvasWrapper..translate(tooltipLeftPosition, tooltipTopPosition + 8.5)
+        ..drawShadow(pathTooltip1, tooltipData.shadowColor, 2,_bgTouchTooltipPaint.color)
+        ..drawPath(pathTooltip, _bgTouchTooltipPaint);
+
       },
     );
 
@@ -1337,6 +1348,7 @@ class LineIndexDrawingInfo<T> {
 class ShapeTooltip {
   static Path createTooltip(Size size) {
     final path = Path()
+    ..moveTo(size.width, size.width)
       ..moveTo(size.width * 0.1288660, size.height * 0.03061224)
       ..cubicTo(
         size.width * 0.08331649,
@@ -1372,6 +1384,7 @@ class ShapeTooltip {
       )
       ..lineTo(size.width * 0.1288660, size.height * 0.03061224)
       ..close();
+
     return path;
   }
 }

@@ -7,6 +7,7 @@ export 'src/chart/base/base_chart/base_chart_data.dart';
 export 'src/chart/base/base_chart/fl_touch_event.dart';
 export 'src/chart/line_chart/line_chart.dart';
 export 'src/chart/line_chart/line_chart_data.dart';
+export 'src/utils/date_time_util.dart';
 export 'src/utils/light_house_tooltip.dart';
 // export 'src/chart/scatter_chart/scatter_chart.dart';
 // export 'src/chart/scatter_chart/scatter_chart_data.dart';

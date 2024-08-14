@@ -386,7 +386,7 @@ class LineChartBarData<T> with EquatableMixin {
       dashArray: lerpIntList(a.dashArray, b.dashArray, t),
       color: Color.lerp(a.color, b.color, t),
       gradient: Gradient.lerp(a.gradient, b.gradient, t),
-      spots: lerpFlSpotList(a.spots, b.spots, t)!,
+      spots: [],
       showingIndicators: b.showingIndicators,
       shadow: Shadow.lerp(a.shadow, b.shadow, t)!,
       isStepLineChart: b.isStepLineChart,
@@ -1046,6 +1046,7 @@ class LineTouchTooltipData<T> with EquatableMixin {
     this.showOnTopOfTheChartBoxArea = false,
     this.rotateAngle = 0.0,
     this.tooltipBorder = BorderSide.none,
+    this.shadowColor = const Color(0xFF000000),
   });
 
   /// Sets a rounded radius for the tooltip.
@@ -1088,6 +1089,9 @@ class LineTouchTooltipData<T> with EquatableMixin {
   // /// Retrieves data for setting background color of the tooltip.
   final GetLineTooltipColor<T> getTooltipColor;
 
+  /// Color shadow
+  final Color shadowColor;
+
   /// Used for equality check, see [EquatableMixin].
   @override
   List<Object?> get props => [
@@ -1127,7 +1131,7 @@ List<LineTooltipItem<T>?> defaultLineTooltipItem<T>(List<LineBarSpot<T>> touched
       fontSize: 14,
     );
     return LineTooltipItem<T>(touchedSpot.y.toString(),
-        customDataChart: touchedSpot.data,
+        customDataChart: touchedSpot.data ?? LightHouseTooltip() as T,
         textStyleHour: textStyle,
         textStyleDate: textStyle,
         textStyleName: textStyle,
@@ -1207,6 +1211,7 @@ class LineTooltipItem<T> with EquatableMixin {
     this.textDirection = TextDirection.ltr,
     this.children,
     this.isBoolChart = false,
+    this.isShowName = false,
     required this.value,
     required this.customDataChart,
     required this.textStyleHour,
@@ -1214,6 +1219,9 @@ class LineTooltipItem<T> with EquatableMixin {
     required this.textStyleName,
     required this.textStyleValue,
   });
+
+  /// Showing name metric
+  final bool isShowName;
 
   /// Showing text.
   final String text;

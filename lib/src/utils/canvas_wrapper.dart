@@ -153,4 +153,8 @@ class CanvasWrapper<T> {
     path = path.toDashedPath(dashArray);
     drawPath(path, painter);
   }
+
+  void drawShadow(Path path, Color shadowColor, double elevation, Color color) {
+    canvas.drawShadow(path, shadowColor, elevation, true);
+  }
 }
