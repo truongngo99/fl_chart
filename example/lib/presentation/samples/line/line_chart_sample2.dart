@@ -1,7 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
-
-import 'package:dartx/dartx.dart';
 import 'package:fl_chart_app/presentation/resources/app_resources.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +18,6 @@ class _LineChartSample2State extends State<LineChartSample2> {
   ];
   List<List<FlSpot<LightHouseTooltip>>> spotData = [];
   bool showAvg = false;
-  final List<Offset> _offsets = <Offset>[];
-  static const disableAxisTitles = AxisTitles(
-    sideTitles: SideTitles(showTitles: false),
-  );
 
   @override
   void initState() {
@@ -45,18 +38,17 @@ class _LineChartSample2State extends State<LineChartSample2> {
   Future<void> parseJson(
       String fileJson, String nameMetric, Color colorMetric) async {
     final metric1 = await rootBundle.loadString(fileJson);
-    final serris1Json = json.decode(metric1);
+    final serries1Json = json.decode(metric1);
     final list1 = <FlSpot<LightHouseTooltip>>[];
-
-    for (int i = 0; i < serris1Json['timestamps'].length; i++) {
+    for (int i = 0; i < serries1Json['timestamps'].length; i++) {
       list1.add(FlSpot(
-          serris1Json['timestamps'][i] as double,
-          serris1Json["values"][i] as double,
+          serries1Json['timestamps'][i] as double,
+          serries1Json["values"][i] as double,
           LightHouseTooltip(
               color: colorMetric,
               nameMetric: nameMetric,
-              value: serris1Json["values"][i] as double,
-              timestamp: serris1Json["timestamps"][i] * 1000)));
+              value: serries1Json["values"][i] as double,
+              timestamp: serries1Json["timestamps"][i] * 1000)));
     }
     setState(() {
       spotData.add(list1);
@@ -67,6 +59,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 500,
+      width: 700,
       child: Padding(
         padding: const EdgeInsets.only(
           right: 18,
@@ -78,7 +71,12 @@ class _LineChartSample2State extends State<LineChartSample2> {
           children: [
             Expanded(
               child: LineChart<LightHouseTooltip>(
-                avgData(),
+                avgData(spotData),
+              ),
+            ),
+            Expanded(
+              child: LineChart<LightHouseTooltip>(
+                avgData([spotData.first]),
               ),
             ),
           ],
@@ -87,7 +85,8 @@ class _LineChartSample2State extends State<LineChartSample2> {
     );
   }
 
-  LineChartData<LightHouseTooltip> avgData() {
+  LineChartData<LightHouseTooltip> avgData(
+      List<List<FlSpot<LightHouseTooltip>>> dataChartCustom) {
     return LineChartData(
       backgroundColor: Colors.transparent,
       gridData: FlGridData(
@@ -123,7 +122,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
                 e.y.toString(),
                 isBoolChart: true,
                 value: e.data.value.toString(),
-                isShowName: true,
+                isShowName: dataChartCustom.length > 1,
                 customDataChart: e.data,
                 textStyleDate: const TextStyle(
                     color: Colors.grey,
@@ -149,84 +148,20 @@ class _LineChartSample2State extends State<LineChartSample2> {
             }).toList();
           },
         ),
-        touchCallback: (touchEvent, lineTouchRsp) {
-          // if (touchEvent is FlLongPressStart) {
-          //   _offsets.add(touchEvent.details.localPosition);
-          // } else if (touchEvent is FlLongPressEnd) {
-          //   _offsets.clear();
-          //   isRepaint = false;
-          //   if (actualMinAxis != null && actualMaxAxis != null) {
-          //     final isAllow = selectProvider.setZoom(actualMinAxis, actualMaxAxis);
-          //     if (!isAllow) {
-          //       Future.delayed(const Duration(milliseconds: 100), () {
-          //         ScaffoldMessenger.of(context).showSnackBar(
-          //           SnackBar(
-          //             content: Text(
-          //               alertSelectedArea,
-          //               maxLines: 1,
-          //               textAlign: TextAlign.center,
-          //               style: textTheme.bodyLarge?.copyWith(
-          //                 color: colorWhite,
-          //                 fontWeight: FontWeight.w600,
-          //                 fontSize: 14,
-          //                 fontStyle: FontStyle.normal,
-          //                 letterSpacing: 0.3,
-          //                 height: 1,
-          //               ),
-          //             ),
-          //             backgroundColor: const Color.fromRGBO(247, 123, 116, 1),
-          //             behavior: SnackBarBehavior.floating,
-          //             duration: const Duration(seconds: 3),
-          //             elevation: 1.0,
-          //             width: 270,
-          //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          //             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          //           ),
-          //         );
-          //       });
-          //       actualMaxAxis = null;
-          //       actualMaxAxis = null;
-          //     }
-          //   } else {
-          //     Future.delayed(const Duration(milliseconds: 1), () {});
-          //   }
-          // } else if (touchEvent is FlLongPressMoveUpdate) {
-          //   ref.read(toolTipStateProvider.notifier).turnOffTooltip();
-          //   _offsets.add(touchEvent.details.localPosition);
-          // }
-        },
         getTouchLineEnd: <LightHouseTooltip>(data, index) => double.infinity,
         distanceCalculator: (touchPoint, spotPixelCoordinates) =>
             (touchPoint - spotPixelCoordinates).distance,
-        getTouchedSpotIndicator: (barData, spotIndexes) {
-          return spotIndexes.map((e) {
-            return TouchedSpotIndicatorData<LightHouseTooltip>(
-              const FlLine(strokeWidth: 1, color: Colors.black),
-              FlDotData<LightHouseTooltip>(
-                checkToShowDot: (spot, barData) => true,
-                getDotPainter: (spot, xPercentage, bar, index) {
-                  // if (spot.data != null) {
-                  //   final p = spot.data!;
-                  //   final timeChart = DateTimeUtil.convertMillisecondToDateTime(p.timestamp.toInt());
-                  //   ref.read(toolTipStateProvider.notifier).passDataInTooltip(
-                  //       dateTime: timeChart,
-                  //       isBoolChart: widget.isChartBool,
-                  //       value: p.value as double,
-                  //       color: p.color,
-                  //       unit: widget.unit,
-                  //       labelBool0: widget.labelBool0 ?? "",
-                  //       labelBool1: widget.labelBool1 ?? "",
-                  //       name: widget.metrics.length > 1 ? p.nameMetric : "",
-                  //       valueType: widget.metrics[0].metric_value_type,
-                  //       fractionDigit: p.fractionDigit);
-                  // }
-                  return FlDotCirclePainter<LightHouseTooltip>(
-                      color: spot.data.color ?? Colors.red, radius: 8);
-                },
-              ),
-            );
-          }).toList();
-        },
+        getTouchedSpotIndicator: (barData, spotIndexes) => spotIndexes
+            .map((e) => TouchedSpotIndicatorData<LightHouseTooltip>(
+                  const FlLine(strokeWidth: 1, color: Colors.black),
+                  FlDotData<LightHouseTooltip>(
+                    checkToShowDot: (spot, barData) => true,
+                    getDotPainter: (spot, xPercentage, bar, index) =>
+                        FlDotCirclePainter<LightHouseTooltip>(
+                            color: spot.data.color ?? Colors.red, radius: 8),
+                  ),
+                ))
+            .toList(),
       ),
       borderData: FlBorderData(
         show: true,
@@ -238,12 +173,13 @@ class _LineChartSample2State extends State<LineChartSample2> {
           show: true,
           leftTitles: getLeftTitles(),
           bottomTitles: getBottomTitles()),
-      lineBarsData: getLineBarsData(),
+      lineBarsData: getLineBarsData(dataChartCustom),
     );
   }
 
-  List<LineChartBarData<LightHouseTooltip>> getLineBarsData() {
-    return spotData.map((chartData) {
+  List<LineChartBarData<LightHouseTooltip>> getLineBarsData(
+      List<List<FlSpot<LightHouseTooltip>>> data) {
+    return data.map((chartData) {
       final color = chartData[0].data.color;
       return LineChartBarData<LightHouseTooltip>(
           isCurved: true,

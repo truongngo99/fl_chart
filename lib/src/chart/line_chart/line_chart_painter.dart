@@ -1062,10 +1062,6 @@ class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
     if (drawingTextPainters.isEmpty) {
       return;
     }
-    var drawingTextPaintersDraw = <TextPainter>[];
-    if (drawingTextPainters.length >= 3) {
-      drawingTextPaintersDraw = drawingTextPainters.sublist(0, 3);
-    }
 
     /// biggerWidth
     /// some texts maybe larger, then we should
@@ -1076,13 +1072,13 @@ class LineChartPainter<T> extends AxisChartPainter<T, LineChartData<T>> {
     /// draw the tooltip's height as tall as sumTextsHeight
     var biggerWidth = 0.0;
     var sumTextsHeight = 0.0;
-    for (final tp in drawingTextPaintersDraw) {
+    for (final tp in drawingTextPainters) {
       if (tp.width > biggerWidth) {
         biggerWidth = tp.width;
       }
       sumTextsHeight += tp.height;
     }
-    sumTextsHeight += (drawingTextPaintersDraw.length - 1) * textsBelowMargin;
+    sumTextsHeight += (drawingTextPainters.length - 1) * textsBelowMargin;
 
     /// if we have multiple bar lines,
     /// there are more than one FlCandidate on touch area,
