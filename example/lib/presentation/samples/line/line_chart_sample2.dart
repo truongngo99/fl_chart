@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:math';
 
+import 'package:dartx/dartx.dart';
 import 'package:fl_chart_app/presentation/resources/app_resources.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LineChartSample2 extends StatefulWidget {
   const LineChartSample2({super.key});
@@ -16,40 +19,70 @@ class _LineChartSample2State extends State<LineChartSample2> {
     AppColors.contentColorCyan,
     AppColors.contentColorBlue,
   ];
-  List<FlSpot<LightHouseTooltip>> spotData = [];
+  List<List<FlSpot<LightHouseTooltip>>> spotData = [];
   bool showAvg = false;
-  List<Offset> _offsets = <Offset>[];
+  final List<Offset> _offsets = <Offset>[];
   static const disableAxisTitles = AxisTitles(
     sideTitles: SideTitles(showTitles: false),
   );
 
   @override
   void initState() {
-    List.generate(20, (index) {
-      final yRand = Random().nextDouble() * 10;
-      spotData.add(FlSpot(
-          index.toDouble(), yRand, LightHouseTooltip(timestamp: 123456708, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1)));
-    });
+    parseJson('assets/metrec1.json', "metric1", Colors.red);
+    parseJson('assets/metrec2.json', "metric2", Colors.yellow);
+    parseJson('assets/metrec3.json', "metric3", Colors.green);
+    parseJson('assets/metrec4.json', "metric4", Colors.blue);
+    parseJson('assets/metrec5.json', "metric5", Colors.deepPurple);
+    parseJson('assets/metrec6.json', "metric6", Colors.pink);
+    // List.generate(20, (index) {
+    //   final yRand = Random().nextDouble() * 10;
+    //   spotData.add(FlSpot(
+    //       index.toDouble(), yRand, LightHouseTooltip(timestamp: 123456708, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1)));
+    // });
     super.initState();
+  }
+
+  Future<void> parseJson(
+      String fileJson, String nameMetric, Color colorMetric) async {
+    final metric1 = await rootBundle.loadString(fileJson);
+    final serris1Json = json.decode(metric1);
+    final list1 = <FlSpot<LightHouseTooltip>>[];
+
+    for (int i = 0; i < serris1Json['timestamps'].length; i++) {
+      list1.add(FlSpot(
+          serris1Json['timestamps'][i] as double,
+          serris1Json["values"][i] as double,
+          LightHouseTooltip(
+              color: colorMetric,
+              nameMetric: nameMetric,
+              value: serris1Json["values"][i] as double,
+              timestamp: serris1Json["timestamps"][i] * 1000)));
+    }
+    setState(() {
+      spotData.add(list1);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        right: 18,
-        left: 12,
-        top: 24,
-        bottom: 50,
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: LineChart<LightHouseTooltip>(
-              avgData(),
+    return SizedBox(
+      height: 500,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          right: 18,
+          left: 12,
+          top: 24,
+          bottom: 50,
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: LineChart<LightHouseTooltip>(
+                avgData(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -61,7 +94,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
         show: true,
         drawHorizontalLine: true,
         drawVerticalLine: false,
-        horizontalInterval: 2,
+        horizontalInterval: 35 / 5,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
             color: Colors.black,
@@ -70,9 +103,9 @@ class _LineChartSample2State extends State<LineChartSample2> {
         },
       ),
       showingTooltipIndicators: [const ShowingTooltipIndicators([])],
-      maxX: spotData.last.x,
-      minX: spotData.first.x,
-      maxY: 10,
+      minX: 1696403435.603,
+      maxX: 1696404306.38,
+      maxY: 35,
       minY: 0,
       lineTouchData: LineTouchData(
         longPressDuration: const Duration(milliseconds: 50),
@@ -80,26 +113,34 @@ class _LineChartSample2State extends State<LineChartSample2> {
           tooltipRoundedRadius: 16,
           tooltipPadding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           tooltipMargin: 0,
-          shadowColor: Random().nextBool() ? Colors.grey.withOpacity(0.5) : const Color.fromARGB(0, 15, 14, 14),
-          getTooltipColor: (touchedSpot) => const Color(0xFF3b3f4b),
+          shadowColor: true
+              ? Colors.grey.withOpacity(0.5)
+              : const Color.fromARGB(0, 15, 14, 14),
+          getTooltipColor: (touchedSpot) => Colors.white,
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((e) {
               return LineTooltipItem(
                 e.y.toString(),
                 isBoolChart: true,
-                value: "truiong",
-                // isShowName: true,
+                value: e.data.value.toString(),
+                isShowName: true,
                 customDataChart: e.data,
-                textStyleDate: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w700),
+                textStyleDate: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700),
                 textStyleHour: const TextStyle(
                   fontSize: 16,
                   height: 1.25,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
-                textStyleName: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w700),
-                textStyleValue: const TextStyle(
-                  color: Colors.blue,
+                textStyleName: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700),
+                textStyleValue: TextStyle(
+                  color: e.data.color,
                   fontSize: 20,
                   height: 1.5,
                   fontWeight: FontWeight.w700,
@@ -155,10 +196,12 @@ class _LineChartSample2State extends State<LineChartSample2> {
           // }
         },
         getTouchLineEnd: <LightHouseTooltip>(data, index) => double.infinity,
+        distanceCalculator: (touchPoint, spotPixelCoordinates) =>
+            (touchPoint - spotPixelCoordinates).distance,
         getTouchedSpotIndicator: (barData, spotIndexes) {
           return spotIndexes.map((e) {
             return TouchedSpotIndicatorData<LightHouseTooltip>(
-              FlLine(strokeWidth: 1, color: Colors.black),
+              const FlLine(strokeWidth: 1, color: Colors.black),
               FlDotData<LightHouseTooltip>(
                 checkToShowDot: (spot, barData) => true,
                 getDotPainter: (spot, xPercentage, bar, index) {
@@ -177,7 +220,8 @@ class _LineChartSample2State extends State<LineChartSample2> {
                   //       valueType: widget.metrics[0].metric_value_type,
                   //       fractionDigit: p.fractionDigit);
                   // }
-                  return FlDotCirclePainter<LightHouseTooltip>(color: spot.data?.color ?? Colors.red, radius: 8);
+                  return FlDotCirclePainter<LightHouseTooltip>(
+                      color: spot.data.color ?? Colors.red, radius: 8);
                 },
               ),
             );
@@ -186,67 +230,112 @@ class _LineChartSample2State extends State<LineChartSample2> {
       ),
       borderData: FlBorderData(
         show: true,
-        border: const Border(bottom: BorderSide(width: 2, color: Colors.red), top: BorderSide(width: 1, color: Colors.yellow)),
+        border: const Border(
+            bottom: BorderSide(width: 2, color: Colors.red),
+            top: BorderSide(width: 1, color: Colors.yellow)),
       ),
       titlesData: FlTitlesData(
           show: true,
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              interval: 2,
-              showTitles: true,
-              getTitlesWidget: (value, meta) => Text(
-                value.toString(),
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ),
-          bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-            interval: 5,
-            reservedSize: 30,
-            showTitles: true,
-            getTitlesWidget: (value, meta) => Text(
-              value.toString(),
-              style: TextStyle(color: Colors.black),
-            ),
-          ))),
+          leftTitles: getLeftTitles(),
+          bottomTitles: getBottomTitles()),
       lineBarsData: getLineBarsData(),
     );
   }
 
   List<LineChartBarData<LightHouseTooltip>> getLineBarsData() {
-    return [
-      LineChartBarData<LightHouseTooltip>(
+    return spotData.map((chartData) {
+      final color = chartData[0].data.color;
+      return LineChartBarData<LightHouseTooltip>(
           isCurved: true,
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
               colors: [
-                Colors.blue.withOpacity(.4),
-                Colors.blue.withOpacity(.02),
+                color.withOpacity(.4),
+                color.withOpacity(.02),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
-            color: Colors.blue,
+            color: color,
+            applyCutOffY: true,
+            cutOffY: 0.0,
           ),
           dotData: const FlDotData(
             show: false,
             checkToShowDot: showAllDots,
             getDotPainter: defaultGetDotPainter,
           ),
-          color: Colors.blue,
+          color: color,
           show: true,
-          spots: spotData,
-          preventCurveOverShooting: false,
-          preventCurveOvershootingThreshold: false ? 0.0 : 10.0),
-    ];
+          spots: chartData,
+          preventCurveOverShooting: true,
+          preventCurveOvershootingThreshold: 0.0);
+    }).toList();
+  }
+
+  AxisTitles getLeftTitles() {
+    return AxisTitles(
+      sideTitles: SideTitles(
+        showTitles: true,
+        interval: 35 / 5,
+        reservedSize: 40,
+        getTitlesWidget: (value, meta) {
+          return SideTitleWidget(
+            axisSide: meta.axisSide,
+            space: 0.0,
+            fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 1,
+                  height: 8,
+                  color: Colors.grey.shade300,
+                  margin: const EdgeInsets.only(bottom: 4),
+                ),
+                Text(value.toString(),
+                    style:
+                        const TextStyle(fontSize: 13, color: Colors.black54)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  AxisTitles getBottomTitles() {
+    return AxisTitles(
+      drawBelowEverything: false,
+      sideTitles: SideTitles(
+        showTitles: true,
+        reservedSize: 40,
+        interval: (1696404306.38 - 1696403435.603) / 5,
+        getTitlesWidget: (value, meta) {
+          final time =
+              DateTime.fromMillisecondsSinceEpoch((value * 1000).toInt());
+          return SideTitleWidget(
+            axisSide: meta.axisSide,
+            space: 0.0,
+            fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 1,
+                  height: 8,
+                  color: Colors.grey.shade300,
+                  margin: const EdgeInsets.only(bottom: 4),
+                ),
+                Text(DateTimeUtil.formatHm(time),
+                    style:
+                        const TextStyle(fontSize: 13, color: Colors.black54)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }
-
-
-final spotData = <FlSpot<LightHouseTooltip>>[
-  FlSpot(1723605896, 15, LightHouseTooltip(timestamp: 1723605896000, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1),),
-  FlSpot(1723606196, 15, LightHouseTooltip(timestamp: 1723606196000, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1),),
-  FlSpot(1723606496, 15, LightHouseTooltip(timestamp: 1723606496000, value: 15, nameMetric: "メモリ使用率", color: const Color(0xff01a7d9), fractionDigit: 1),),
-];

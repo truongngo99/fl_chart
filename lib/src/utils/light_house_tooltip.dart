@@ -17,6 +17,6 @@ class LightHouseTooltip {
 
   @override
   String toString() {
-    return 'NameMetric: $nameMetric, Timestamp: $timestamp, Value: $value, FractionDigit: $fractionDigit, color: $color';
+    return 'NameMetric: $nameMetric, Timestamp: $timestamp, Value: $value, FractionDigit: ${fractionDigit ?? null}, color: $color';
   }
 }

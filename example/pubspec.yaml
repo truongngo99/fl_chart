@@ -39,3 +39,9 @@ flutter:
   assets:
     - assets/icons/
     - assets/fonts/
+    - assets/metrec1.json
+    - assets/metrec2.json
+    - assets/metrec3.json
+    - assets/metrec4.json
+    - assets/metrec5.json
+    - assets/metrec6.json
