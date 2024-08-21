@@ -62,7 +62,8 @@ class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
   }
 
   LineChartData<T> _withTouchedIndicators(LineChartData<T> lineChartData) {
-    if (!lineChartData.lineTouchData.enabled || !lineChartData.lineTouchData.handleBuiltInTouches) {
+    if (!lineChartData.lineTouchData.enabled ||
+        !lineChartData.lineTouchData.handleBuiltInTouches) {
       return lineChartData;
     }
 
@@ -82,7 +83,10 @@ class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
 
     /// Calculate minX, maxX, minY, maxY for [LineChartData] if they are null,
     /// it is necessary to render the chart correctly.
-    if (newData.minX.isNaN || newData.maxX.isNaN || newData.minY.isNaN || newData.maxY.isNaN) {
+    if (newData.minX.isNaN ||
+        newData.maxX.isNaN ||
+        newData.minY.isNaN ||
+        newData.maxY.isNaN) {
       final values = _lineChartHelper.calculateMaxAxisValues(
         newData.lineBarsData,
       );
@@ -98,7 +102,8 @@ class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
     if (lineTouchData.enabled && lineTouchData.handleBuiltInTouches) {
       _providedTouchCallback = lineTouchData.touchCallback;
       newData = newData.copyWith(
-        lineTouchData: newData.lineTouchData.copyWith(touchCallback: _handleBuiltInTouch),
+        lineTouchData:
+            newData.lineTouchData.copyWith(touchCallback: _handleBuiltInTouch),
       );
     }
     return newData;
@@ -113,16 +118,20 @@ class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
     }
     _providedTouchCallback?.call(event, touchResponse);
 
-    if (!event.isInterestedForInteractions || touchResponse?.lineBarSpots == null || touchResponse!.lineBarSpots!.isEmpty) {
+    if (!event.isInterestedForInteractions ||
+        touchResponse?.lineBarSpots == null ||
+        touchResponse!.lineBarSpots!.isEmpty) {
       setState(() {
         _showingTouchedTooltips.clear();
         _showingTouchedIndicators.clear();
       });
+      _providedTouchCallback?.call(FlHideVerticalLine(), null);
       return;
     }
 
     setState(() {
-      final sortedLineSpots = List.of(touchResponse.lineBarSpots!)..sort((spot1, spot2) => spot2.y.compareTo(spot1.y));
+      final sortedLineSpots = List.of(touchResponse.lineBarSpots!)
+        ..sort((spot1, spot2) => spot2.y.compareTo(spot1.y));
 
       _showingTouchedIndicators.clear();
       for (var i = 0; i < touchResponse.lineBarSpots!.length; i++) {
@@ -142,7 +151,10 @@ class _LineChartState<T> extends AnimatedWidgetBaseState<LineChart<T>> {
     _lineChartDataTween = visitor(
       _lineChartDataTween,
       _getData(),
-      (dynamic value) => LineChartDataTween<T>(begin: value as LineChartData<T>, end: widget.data),
+      (dynamic value) => LineChartDataTween<T>(
+        begin: value as LineChartData<T>,
+        end: widget.data,
+      ),
     ) as LineChartDataTween<T>?;
   }
 }

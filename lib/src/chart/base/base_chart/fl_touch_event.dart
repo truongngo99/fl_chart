@@ -247,3 +247,5 @@ class FlPointerExitEvent extends FlTouchEvent {
   @override
   Offset get localPosition => event.localPosition;
 }
+
+class FlHideVerticalLine extends FlTouchEvent {}
